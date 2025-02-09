@@ -6,6 +6,8 @@ import cookieParser from 'cookie-parser'
 import messageRouter from './routes/message.routes.js'
 import cors from 'cors'
 import { app, server } from './lib/socket.js'
+import userRouter from './routes/user.routes.js'
+import spaceRouter from './routes/space.routes.js'
 
 dotenv.config()
 
@@ -21,6 +23,8 @@ app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
 app.use('/api/auth', authRouter)
 app.use('/api/message', messageRouter)
+app.use('/api/user', userRouter)
+app.use('/api/space', spaceRouter)
 
 const PORT = process.env.PORT || 5001
 

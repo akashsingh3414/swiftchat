@@ -62,11 +62,21 @@ export const useAuthStore = create((set, get) => ({
 
   logout: async () => {
     try {
-      await axiosInstance.post("/auth/logout");
+      await axiosInstance.get("/auth/logout");
       set({ authUser: null });
       toast.success("Logged out successfully");
 
       get().disconnectSocket()
+    } catch (error) {
+      toast.error(error.response.data.message);
+    }
+  },
+
+  deleteProfile: async () => {
+    try {
+      await axiosInstance.delete('/user/delete')
+      set({authUser: null})
+      toast.success('Sorry to say Good bye. Account deleted.')
     } catch (error) {
       toast.error(error.response.data.message);
     }

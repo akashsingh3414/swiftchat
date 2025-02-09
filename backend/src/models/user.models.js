@@ -10,6 +10,15 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    connectionCode: {
+        type: String,
+        required: true,
+        unique: true,
+    },
+    connectedUsers: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+    }],
     password: {
         type: String,
         required: true,
@@ -19,10 +28,10 @@ const userSchema = new mongoose.Schema({
         type: String,
         default: ''
     },
-    filePath: {
-        type: String,
-        default: ''
-    }
+    spaces: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Space'
+    }]
 }, {timestamps: true})
 
 export const User = mongoose.model('User', userSchema)

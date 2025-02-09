@@ -27,6 +27,16 @@ io.on('connection', (socket) => {
 
     io.emit('getOnlineUsers', Object.keys(userSocketMap)) //used to send events to all connected clients
 
+    socket.on('joinGroup', (spaceId) => {
+        socket.join(spaceId.toString());
+        console.log(`User $userId joined group ${spaceId}`);
+    });
+
+    socket.on('leaveGroup', (spaceId) => {
+        socket.leave(spaceId.toString());
+        console.log(`User $userId left group ${spaceId}`);
+    });
+
     socket.on('disconnect', ()=> {
         console.log('a user disconnected: ', socket.id);
         delete userSocketMap[userId];

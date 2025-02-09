@@ -9,15 +9,15 @@ const messageSchema = new mongoose.Schema({
     receiverId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
-        required: true,
+    },
+    spaceId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Space',
     },
     text: {
         type: String,
     },
     image: {
-        type: String
-    },
-    filePath: {
         type: String
     }
 }, {timestamps: true})
