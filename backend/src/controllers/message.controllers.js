@@ -38,7 +38,7 @@ export const getMessagesForUser  = async (req, res) => {
 export const sendMessage = async (req, res) => {
     try {
         const text = req.body.text;
-        const receiverId = req.params.addressId;
+        const receiverId = req.params.receiverId;
         const senderId = req.user.id;
 
         const space = await Space.findById(receiverId.toString())
@@ -62,19 +62,19 @@ export const sendMessage = async (req, res) => {
             senderId,
             text: text ? text : '',
             image: imageUrl,
-            spaceId: space ? space._id : null,
-            receiverId: !space ? user._id : null,
+            receiverId: space ? space._id : user._id,
         })
 
         await newMessage.save()
         if(space) {
-            io.to(space._id.toString()).emit('newMessage', newMessage);
+            io.to(space._id.toString()).emit('newGroupMessage', newMessage);
         } else {
             const receiverSocketId = getReceiverSocketId(user._id);
             if(receiverSocketId) {
                 io.to(receiverSocketId).emit('newMessage', newMessage);
             }
         }
+
         return res.status(201).json({message: newMessage})
 
     } catch (error) {
@@ -115,22 +115,22 @@ export const deleteUserMessages = async (req, res) => {
 };
 
 export const deleteAllMessages = async (req, res) => {
-    const spaceId = req.body.spaceId;
+    const receiverId = req.body.receiverId;
     const userId = req.user.id;
 
     try {
-        if (!spaceId) {
+        if (!receiverId) {
             return res.status(400).json({ message: "Space id is required" });
         }
 
-        const space = await Space.findById(spaceId);
+        const space = await Space.findById(receiverId);
         if (!space) return res.status(400).json({ message: 'Invalid space id' });
 
         if (space.creator.toString() !== userId) {
             return res.status(403).json({ message: 'Request not allowed to non-admins' });
         }
 
-        const messages = await Message.find({ spaceId });
+        const messages = await Message.find({ receiverId });
 
         for (const message of messages) {
             if (message.image) {
@@ -138,7 +138,7 @@ export const deleteAllMessages = async (req, res) => {
             }
         }
 
-        await Message.deleteMany({ spaceId });
+        await Message.deleteMany({ receiverId });
 
         return res.status(200).json({ message: 'Messages deleted successfully' });
 

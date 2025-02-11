@@ -3,7 +3,7 @@ import { useAuthStore } from "../store/useAuthStore";
 import { Camera, Mail, User } from "lucide-react";
 
 const ProfilePage = () => {
-  const { authUser, isUpdatingProfile, updateProfile } = useAuthStore();
+  const { authUser, isUpdatingProfile, updateProfile, deleteProfile } = useAuthStore();
   const [selectedImg, setSelectedImg] = useState(null);
 
   const handleImageUpload = async (e) => {
@@ -18,8 +18,7 @@ const ProfilePage = () => {
     } catch (error) {
       console.error("Image upload failed", error);
     }
-  };
-  
+  };  
 
   return (
     <div className="max-w-2xl mx-auto p-4 mt-16">
@@ -84,6 +83,10 @@ const ProfilePage = () => {
           <div className="mt-6 bg-base-300 rounded-xl p-6">
             <h2 className="text-lg font-medium  mb-4">Account Information</h2>
             <div className="space-y-3 text-sm">
+            <div className="flex items-center justify-between py-2 border-b border-zinc-700">
+                <span>Connection Code</span>
+                <span>{authUser.connectionCode}</span>
+              </div>
               <div className="flex items-center justify-between py-2 border-b border-zinc-700">
                 <span>Member Since</span>
                 <span>{authUser.createdAt?.split("T")[0]}</span>
@@ -91,6 +94,10 @@ const ProfilePage = () => {
               <div className="flex items-center justify-between py-2">
                 <span>Account Status</span>
                 <span className="text-green-500">Active</span>
+              </div>
+              <div>
+                <button onClick={deleteProfile}
+                className="border-none p-2 bg-red-500 rounded-lg text-white hover:bg-red-600">Delete Account</button>
               </div>
             </div>
           </div>

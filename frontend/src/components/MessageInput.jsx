@@ -2,13 +2,15 @@ import { useRef, useState } from "react";
 import { useChatStore } from "../store/useChatStore";
 import { Image, Send, X } from "lucide-react";
 import { toast } from "sonner";
+import { useSpaceStore } from "../store/useSpaceStore";
 
 const MessageInput = () => {
   const [text, setText] = useState("");
   const [imagePreview, setImagePreview] = useState(null);
   const fileInputRef = useRef(null);
-  const { sendMessage } = useChatStore();
-
+  const { sendMessage, selectedUser } = useChatStore();
+  const { sendMessageToSpace } = useSpaceStore();
+    
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (!file.type.startsWith("image/")) {
@@ -36,7 +38,8 @@ const MessageInput = () => {
     }
 
     try {
-      await sendMessage(formData);
+
+      selectedUser ? await sendMessage(formData) : await sendMessageToSpace(formData);
 
       setText("");
       setImagePreview(null);

@@ -3,6 +3,8 @@ import { toast } from "sonner";
 import { axiosInstance } from "../lib/axios";
 import { useAuthStore } from "./useAuthStore";
 
+
+
 export const useChatStore = create((set, get) => ({
   messages: [],
   users: [],
@@ -35,20 +37,27 @@ export const useChatStore = create((set, get) => ({
   },
   
   sendMessage: async (messageData) => {
-    const { selectedUser, messages } = get();  
+    const { selectedUser, messages } = get();
+    const socket = useAuthStore.getState().socket;
+
+    if (!selectedUser) return;
+
     try {
       const res = await axiosInstance.post(`/message/send/${selectedUser._id}`, messageData, {
         headers: {
-          'Content-Type': 'multipart/form-data',
+          "Content-Type": "multipart/form-data",
         },
       });
-  
-      set({ messages: [...messages, res.data.message] });
+
+      const newMessage = res.data.message;
+
+      set({ messages: [...messages, newMessage] });
+
     } catch (error) {
       toast.error(error?.response?.data?.message || error.message);
     }
   },
-  
+
   subscribeToMessages: () => {
     const { selectedUser } = get();
     if (!selectedUser) return;
@@ -57,6 +66,7 @@ export const useChatStore = create((set, get) => ({
 
     socket.on("newMessage", (newMessage) => {
       const isMessageSentFromSelectedUser = newMessage.senderId === selectedUser._id;
+      
       if (!isMessageSentFromSelectedUser) return;
       set({
         messages: [...get().messages, newMessage],

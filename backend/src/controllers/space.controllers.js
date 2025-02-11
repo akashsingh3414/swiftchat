@@ -205,7 +205,7 @@ export const modifyInvite = async (req, res) => {
 export const getMessagesForSpace  = async (req, res) => {
     const spaceId = req.params.spaceId;
     try {
-        const messages = await Message.find({spaceId})
+        const messages = await Message.find({receiverId: spaceId})
 
         res.status(200).json({messages})
     } catch (error) {
