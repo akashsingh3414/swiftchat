@@ -1,8 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useChatStore } from "../store/useChatStore";
 import { useAuthStore } from "../store/useAuthStore";
 import SidebarSkeleton from "./skeletons/SidebarSkeleton";
-import { Users, Grid } from "lucide-react";
 import { useSpaceStore } from "../store/useSpaceStore";
 
 const Sidebar = () => {
@@ -10,119 +9,79 @@ const Sidebar = () => {
   const { getSpaces, spaces, selectedSpace, setSelectedSpace, isSpacesLoading } = useSpaceStore();
   const { onlineUsers } = useAuthStore();
 
-  const [showSpaces, setShowSpaces] = useState(false);
-  const [showOnlineOnly, setShowOnlineOnly] = useState(false);
-
   useEffect(() => {
-    if (showSpaces) {
-      getSpaces();
-    } else {
-      getUsers();
-    }
-  }, [showSpaces, getSpaces, getUsers]);
-
-  const handleChatDisplay = (e) => {
-    e.preventDefault();
-    setShowSpaces(!showSpaces);
-    showSpaces ? setSelectedSpace(null) : setSelectedUser(null)
-  }
-
-  const filteredUsers = showOnlineOnly
-    ? users.filter((user) => onlineUsers.includes(user._id))
-    : users;
+    getUsers();
+    getSpaces();
+  }, [getUsers, getSpaces]);
 
   if (isUsersLoading || isSpacesLoading) return <SidebarSkeleton />;
 
+  const combinedList = [...spaces, ...users];
+  const handleSelection = (item, isSpace) => {
+    if (isSpace) {
+      setSelectedUser(null);
+      setSelectedSpace(item);
+    } else {
+      setSelectedSpace(null);
+      setSelectedUser(item);
+    }
+  };
+
+  const isExpanded = !selectedUser && !selectedSpace;
+
   return (
-    <aside className="h-full w-20 lg:w-72 border-r border-base-300 flex flex-col transition-all duration-200">
-      {/* Header Section */}
-      <div className="border-b border-base-300 w-full p-5 flex justify-between items-center">
-        {/* Toggle Button */}
-        <button
-          className={`rounded-full p-2 transition-all duration-200 ${
-            showSpaces ? "bg-primary text-white" : "border hover:bg-gray-200"
-          }`}
-          onClick={handleChatDisplay}
-        >
-          {showSpaces ? <Users className="size-5" /> : <Grid className="size-5" />}
-        </button>
+    <aside
+      className={`h-full flex flex-col px-1 py-1 transition-all duration-300 ${
+        isExpanded ? "w-48 border-r border-base-300 bg-base-200" : "w-16"
+      }`}
+    >
+      {isExpanded && <div className="flex items-center justify-center px-2 mb-1 border-b border-base-300 text-primary font-semibold">Connections ({combinedList.length})</div>}
+      {combinedList.map((item) => {
+        const isSpace = item?.members !== undefined;
+        const isSelected = isSpace ? selectedSpace?._id === item?._id : selectedUser?._id === item?._id;
 
-        {/* Show Online Only (Hidden when Spaces are shown) */}
-        {!showSpaces && (
-          <div className="hidden lg:flex items-center gap-2">
-            <label className="cursor-pointer flex items-center gap-2">
-              <input
-                type="checkbox"
-                checked={showOnlineOnly}
-                onChange={(e) => setShowOnlineOnly(e.target.checked)}
-                className="checkbox checkbox-sm"
-              />
-              <span className="text-sm">Show online only</span>
-            </label>
-            <span className="text-xs text-zinc-500">({onlineUsers.length - 1} online)</span>
+        return (
+          <div key={item?._id} className="relative group">
+            <button
+              onClick={() => handleSelection(item, isSpace)}
+              className={`flex items-center border-b border-base-300 rounded px-2 py-1 transition-all duration-200 w-full text-left ${
+                isSelected ? "bg-primary" : "hover:bg-primary/80 hover:text-base-900"
+              }`}
+            >
+              <div className="relative w-10 h-10">
+                <img
+                  src={item?.profilePic || item?.image || "/avatar.png"}
+                  alt={item?.name || item?.fullName}
+                  className="w-10 h-10 object-cover rounded-full transition-all duration-200"
+                />
+                {!isSpace && onlineUsers.includes(item?._id) && (
+                  <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full" />
+                )}
+              </div>
+
+              {isExpanded && (
+                <span className="text-base-900 font-semibold text-md">
+                  {isSpace
+                    ? item?.name.length > 10
+                      ? item?.name.slice(0, 10) + "..."
+                      : item?.name
+                    : item?.fullName.length > 10
+                    ? item?.fullName.slice(0, 10) + "..."
+                    : item?.fullName}
+                </span>
+              )}
+            </button>
+
+            {!isExpanded && <div className="absolute left-16 top-1/2 transform -translate-y-1/2 border border-primary/100 bg-base-200 text-base/90 text-md px-2 py-1 rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap z-50">
+              {item?.name || item?.fullName}
+            </div>}
           </div>
-        )}
-      </div>
+        );
+      })}
 
-      {/* Content Section */}
-      <div className="overflow-y-auto w-full py-3">
-        {/* Render Users or Spaces */}
-        {showSpaces
-          ? spaces.map((space) => (
-              <button
-                key={space._id}
-                onClick={() => setSelectedSpace(space)}
-                className={`w-full p-3 flex items-center gap-3 hover:bg-base-300 transition-colors ${
-                  selectedSpace?._id === space._id ? "bg-base-300 ring-1 ring-base-300" : ""
-                }`}
-              >
-                <div className="relative mx-auto lg:mx-0">
-                  <img
-                    src={space.image || "/avatar.png"}
-                    alt={space.name}
-                    className="size-12 object-cover rounded-full"
-                  />
-                </div>
-                <div className="hidden lg:block text-left min-w-0">
-                  <div className="font-medium truncate">{space.name}</div>
-                  <div className="text-sm text-zinc-400">{space.members.length} members</div>
-                </div>
-              </button>
-            ))
-          : filteredUsers.map((user) => (
-              <button
-                key={user._id}
-                onClick={() => setSelectedUser(user)}
-                className={`w-full p-3 flex items-center gap-3 hover:bg-base-300 transition-colors ${
-                  selectedUser?._id === user._id ? "bg-base-300 ring-1 ring-base-300" : ""
-                }`}
-              >
-                <div className="relative mx-auto lg:mx-0">
-                  <img
-                    src={user.profilePic || "/avatar.png"}
-                    alt={user.name}
-                    className="size-12 object-cover rounded-full"
-                  />
-                  {onlineUsers.includes(user._id) && (
-                    <span className="absolute bottom-0 right-0 size-3 bg-green-500 rounded-full" />
-                  )}
-                </div>
-                <div className="hidden lg:block text-left min-w-0">
-                  <div className="font-medium truncate">{user.fullName}</div>
-                  <div className="text-sm text-zinc-400">
-                    {onlineUsers.includes(user._id) ? "Online" : "Offline"}
-                  </div>
-                </div>
-              </button>
-            ))}
-
-        {/* No Users/Spaces Available */}
-        {(showSpaces ? spaces.length === 0 : filteredUsers.length === 0) && (
-          <div className="text-center text-zinc-500 py-4">
-            {showSpaces ? "No spaces available" : "No users found"}
-          </div>
-        )}
-      </div>
+      {combinedList.length === 0 && (
+        <div className="text-center text-zinc-500 py-4 text-sm">No chats or spaces</div>
+      )}
     </aside>
   );
 };

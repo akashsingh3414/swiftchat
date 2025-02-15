@@ -29,23 +29,17 @@ export const createSpace = async (req, res) => {
     
         return res.status(201).json({
             message: 'Space created successfully',
-            space: {
-                _id: space._id,
-                name: space.name,
-                spaceCode: space.spaceCode,
-                creator: space.creator,
-            },
-            user
+            space
         })
     } catch (error) {
         console.log('Error in create space controller')
-        return res.status(500).json({message: 'Internal error occured while creating space'})
+        return res.status(500).json({ message: 'Internal error occured while creating space'})
     }
 };
 
 export const connectToSpace = async (req, res) => {
     const userId = req.user.id;
-    const { spaceCode } = req.params;
+    const spaceCode = req.params.spaceCode;
 
     try {
         if (!spaceCode) {
@@ -84,12 +78,7 @@ export const connectToSpace = async (req, res) => {
                 profilePic: user.profilePic,
                 spaces: user.spaces
             },
-            space: {
-                _id: space._id,
-                name: space.name,
-                members: space.members,
-                spaceCode: space.spaceCode
-            }
+            space
         });
 
     } catch (error) {
@@ -116,10 +105,10 @@ export const leaveSpace = async (req, res) => {
         user.spaces = user.spaces.filter(id => id.toString() !== space._id.toString());
         await user.save();
 
-        if(space.members.length === 0) {
+        if(space.members.length === 0 || space.creator == userId) {
             await Message.deleteMany({spaceId: space._id});
             await Space.findByIdAndDelete(space._id);
-            return res.status(200).json({message: "0 member, space deleted"})
+            return res.status(200).json({message: "Space deleted"})
         }
 
         if (!space.members.includes(userId)) {
@@ -175,30 +164,29 @@ export const getSpacesForSidebar = async (req, res) => {
         res.status(200).json({message: 'All spaces fetched successfully', spaces: spaces.spaces })
     } catch (error) {
         console.log('Error in getUsersForSidebar: ', error.message)
-        res.status(500).json({error: "Internal server error"})
+        res.status(500).json({ message: "Internal server error"})
     }
 };
 
 export const modifyInvite = async (req, res) => {
     const userId = req.user.id;
-    const {spaceId, change} = req.body;
+    const { spaceId, change } = req.body;
+
     try {
         const user = await User.findById(userId);
-        if(!user) return res.status(400).json({message: 'User not found'});
+        if (!user) return res.status(400).json({ message: "User not found" });
 
         const space = await Space.findById(spaceId);
-
-        if(!space) return res.status(400).json({message: 'Space not found'});
+        if (!space) return res.status(400).json({ message: "Space not found" });
 
         space.acceptingInvites = change;
-
         await space.save();
 
-        res.status(200).json({message: 'modified invite settings', space })
+        return res.status(200).json({ message: "Modified invite settings", space });
 
     } catch (error) {
-        console.log('Error in modifyInvites: ', error.message)
-        res.status(500).json({error: "Internal server error while updating invite settings"})
+        console.error("Error in modifyInvite:", error);
+        return res.status(500).json({ message: "Internal server error while updating invite settings" });
     }
 };
 
@@ -210,6 +198,29 @@ export const getMessagesForSpace  = async (req, res) => {
         res.status(200).json({messages})
     } catch (error) {
         console.log('Error in getMessagesForUser controller: ',error.message)
-        return res.status(500).json({error: 'Internal server error'})
+        return res.status(500).json({ message: 'Internal server error'})
     }
 }
+
+export const getMembersForSpace = async (req, res) => {
+    const spaceId = req.params.spaceId;
+    const userId = req.user.id;
+
+    try {
+        if(!spaceId) return res.status(400).json({message: 'Space Id is required'})
+        const space = await Space.findById(spaceId);
+
+        if(!space.members?.includes(userId)) return res.status(403).json({message: 'Action not allowed'})
+
+        if (!space) {
+            return res.status(404).json({ message: "Space not found" });
+        }
+    
+        const members = await User.find({ _id: { $in: space.members } }).select("-password -email -spaces");
+    
+        res.status(200).json({message:'Members fetched successfully', members});
+    } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal Server Error" });
+    }
+};

@@ -1,6 +1,6 @@
 import express from 'express'
 import { protectRoute } from '../middlewares/auth.middlewares.js';
-import { connectToSpace, createSpace, deleteSpace, getMessagesForSpace, getSpacesForSidebar, leaveSpace, modifyInvite } from '../controllers/space.controllers.js';
+import { connectToSpace, createSpace, deleteSpace, getMembersForSpace, getMessagesForSpace, getSpacesForSidebar, leaveSpace, modifyInvite } from '../controllers/space.controllers.js';
 import { deleteAllMessages } from '../controllers/message.controllers.js';
 
 const spaceRouter = express.Router();
@@ -12,6 +12,7 @@ spaceRouter.patch('/leave', protectRoute, leaveSpace)
 spaceRouter.delete('/delete', protectRoute, deleteSpace)
 spaceRouter.get('/spaces', protectRoute, getSpacesForSidebar)
 spaceRouter.delete('/message/delete-all', protectRoute, deleteAllMessages)
-spaceRouter.post('/modifyInvite', protectRoute, modifyInvite)
+spaceRouter.post('/modify-invite', protectRoute, modifyInvite)
+spaceRouter.get('/getMembers/:spaceId', protectRoute, getMembersForSpace)
 
 export default spaceRouter

@@ -21,8 +21,7 @@ export const useAuthStore = create((set, get) => ({
 
       get().connectSocket()
     } catch (error) {
-      console.log(error.response.data.message);
-      // toast.error(error.response.data.message);
+      console.log(error.response?.data?.message);
       set({ authUser: null });
     } finally {
       set({ isCheckingAuth: false });
@@ -38,8 +37,7 @@ export const useAuthStore = create((set, get) => ({
 
       get().connectSocket()
     } catch (error) {
-      toast.error(error.response.data.message);
-    } finally {
+        toast.error(error.response?.data?.message || error.message);    } finally {
       set({ isSigningUp: false });
     }
   },
@@ -53,9 +51,8 @@ export const useAuthStore = create((set, get) => ({
 
       get().connectSocket()
     } catch (error) {
-      console.log(error.response.data.message);
-      toast.error(error.response.data.message);
-    } finally {
+      console.log(error.response?.data?.message);
+        toast.error(error.response?.data?.message || error.message);    } finally {
       set({ isLoggingIn: false });
     }
   },
@@ -68,8 +65,7 @@ export const useAuthStore = create((set, get) => ({
 
       get().disconnectSocket()
     } catch (error) {
-      toast.error(error.response.data.message);
-    }
+        toast.error(error.response?.data?.message || error.message);    }
   },
 
   deleteProfile: async () => {
@@ -78,8 +74,7 @@ export const useAuthStore = create((set, get) => ({
       set({authUser: null})
       toast.success('Sorry to say Good bye. Account deleted.')
     } catch (error) {
-      toast.error(error.response.data.message);
-    }
+      toast.error(error.response?.data?.message || error.message);    }
   },
 
   updateProfile: async (data) => {
@@ -89,9 +84,8 @@ export const useAuthStore = create((set, get) => ({
       set({ authUser: res.data.user });
       toast.success("Profile updated successfully");
     } catch (error) {
-      console.log(error.response.data.message);
-      toast.error(error.response.data.message);
-    } finally {
+      console.log(error.response?.data?.message);
+        toast.error(error.response?.data?.message || error.message);    } finally {
       set({ isUpdatingProfile: false });
     }
   },

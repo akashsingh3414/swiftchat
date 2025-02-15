@@ -1,7 +1,10 @@
 export const THEMES = [
     'light',
     'dark',
-    'bumblebee', 
     'corporate', 
-    'cupcake'
+    'cupcake',
+    'black',
+    'business',
+    'night',
+    'winter'
 ]

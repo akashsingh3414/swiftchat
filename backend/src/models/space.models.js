@@ -20,7 +20,8 @@ const spaceSchema = new mongoose.Schema({
     },
     acceptingInvites: {
         type: Boolean,
-        default: true
+        required: true,
+        default: true,
     }
 }, {timestamps: true})
 

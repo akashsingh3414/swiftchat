@@ -18,7 +18,7 @@ export const useChatStore = create((set, get) => ({
       const res = await axiosInstance.get("/message/users");
       set({ users: res.data.users });
     } catch (error) {
-      toast.error(error?.response?.data?.message || error.message);
+      toast.error(error.response?.data?.message || error.message);
     } finally {
       set({ isUsersLoading: false });
     }
@@ -30,7 +30,7 @@ export const useChatStore = create((set, get) => ({
       const res = await axiosInstance.get(`/message/${userId}`);
       set({ messages: res.data.messages });
     } catch (error) {
-      toast.error(error?.response?.data?.message || error.message);
+      toast.error(error.response?.data?.message || error.message);
     } finally {
       set({ isMessagesLoading: false });
     }
@@ -38,7 +38,6 @@ export const useChatStore = create((set, get) => ({
   
   sendMessage: async (messageData) => {
     const { selectedUser, messages } = get();
-    const socket = useAuthStore.getState().socket;
 
     if (!selectedUser) return;
 
@@ -54,7 +53,39 @@ export const useChatStore = create((set, get) => ({
       set({ messages: [...messages, newMessage] });
 
     } catch (error) {
-      toast.error(error?.response?.data?.message || error.message);
+      toast.error(error.response?.data?.message || error.message);
+    }
+  },
+
+  addConnection: async (connectionCode) => {
+    try {
+      const res = await axiosInstance.get(`/user/connect/${connectionCode}`)
+      set({users: [...get().users, res.data.user]})
+    } catch (error) {
+      toast.error(error.response?.data?.message || error.message);
+    }
+  },
+
+  removeConnection: async (connectionCode) => {
+    try {
+      await axiosInstance.patch('/user/remove-connection', {connectionCode})
+      set((state)=>({
+        users: state.users.filter(user=>user.connectionCode!=connectionCode),
+        selectedUser: null
+      }))
+    } catch (error) {
+      toast.error(error.response?.data?.message || error.message);
+    }
+  },
+
+  deleteMyMessages: async (receiverId) => {
+    try {
+      await axiosInstance.post('/message/delete', {receiverId})
+      set((state) => ({
+        messages: state.messages.filter(message => message.receiverId !== receiverId)
+      }));
+    } catch (error) {
+      toast.error(error.response?.data?.message || error.message);
     }
   },
 

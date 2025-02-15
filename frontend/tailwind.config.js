@@ -10,6 +10,6 @@ export default {
   },
   plugins: [daisyui],
   daisyui: {
-    themes: ['light', 'dark', 'bumblebee', 'corporate', 'cupcake']
+    themes: ['light', 'dark', 'corporate', 'cupcake', 'black', 'business', 'night', 'winter']
   }
 }

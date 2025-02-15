@@ -28,6 +28,10 @@ const userSchema = new mongoose.Schema({
         type: String,
         default: ''
     },
+    about: {
+        type: String,
+        default: ''
+    },
     spaces: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Space'

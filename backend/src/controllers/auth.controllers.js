@@ -10,10 +10,10 @@ export const signup = async (req, res) => {
             return res.status(400).json({message: "All fields are required"});
         }
 
-        if(password.length < 8) return res.status(400).json({message: "Password length should be atleast 8"})
+        if(password.length < 8) return res.status(400).json({ message: "Password length should be atleast 8"})
 
         const finduser = await User.findOne({email})
-        if(finduser) return res.status(400).json({message: "Email already exists"});
+        if(finduser) return res.status(400).json({ message: "Email already exists"});
 
         const salt = await bcrypt.genSalt(10)
         const hashedPassword = await bcrypt.hash(password, salt)
@@ -28,7 +28,7 @@ export const signup = async (req, res) => {
             generateToken({userId: user._id}, res)
             await user.save()
 
-            return res.status(201).json({message: "User created successfully", user: {
+            return res.status(201).json({ message: "User created successfully", user: {
                 _id: user._id,
                 fullName: user.fullName,
                 email: user.email,
@@ -36,10 +36,10 @@ export const signup = async (req, res) => {
                 connectionCode
             }});
         }
-        return res.status(400).json({message: "Invalid user data"});
+        return res.status(400).json({ message: "Invalid user data"});
     } catch (error) {
         console.log('Error in signup controller: ', error.message)
-        return res.status(500).json({error: "Internal server error"})
+        return res.status(500).json({ message: "Internal server error"})
     }
 }
 
@@ -48,12 +48,12 @@ export const login = async (req, res) => {
     try {
         const user = await User.findOne({email});
         if(!user){
-            return res.status(400).json({message: "Invalid credentials"});
+            return res.status(400).json({ message: "Invalid credentials"});
         }
 
         const isPasswordCorrect = await bcrypt.compare(password, user.password)
         if(!isPasswordCorrect) {
-            return res.status(400).json({message: "Invalid credentials"});
+            return res.status(400).json({ message: "Invalid credentials"});
         }
 
         generateToken({userId: user._id}, res)
@@ -65,17 +65,17 @@ export const login = async (req, res) => {
         })
     } catch (error) {
         console.log('Error in login controller', error.message)
-        return res.status(500).json({error: "Internal server error"})
+        return res.status(500).json({ message: "Internal server error"})
     }
 }
 
 export const logout = async (req, res) => {
     try {
         res.cookie("jwt", "", {maxAge: 0})
-        return res.status(200).json({message: "Logged out successfully"})
+        return res.status(200).json({ message: "Logged out successfully"})
     } catch (error) {
         console.log("Error in logout controller", error.message)
-        return res.status(500).json({error: "Internal server error"})
+        return res.status(500).json({ message: "Internal server error"})
     }
 }
 

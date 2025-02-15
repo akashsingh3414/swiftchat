@@ -47,7 +47,7 @@ export const updateProfile = async (req, res) => {
         return res.status(200).json({ message: 'Profile updated successfully', user });
     } catch (error) {
         console.error('Update Profile Error:', error);
-        return res.status(500).json({ error: 'Internal server error' });
+        return res.status(500).json({ message: 'Internal server error' });
     }
 };
 
@@ -85,16 +85,16 @@ export const connectUser = async (req, res) => {
         await user.save();
         await targetUser.save();
 
-        return res.status(200).json({ message: "Connection successful" });
+        return res.status(200).json({ message: "Connection successful", user: targetUser});
     } catch (error) {
         console.error("Error in connectUser:", error);
-        return res.status(500).json({ error: "Internal server error" });
+        return res.status(500).json({ message: "Internal server error" });
     }
 };
 
 export const removeConnection = async (req, res) => {
     const userId = req.user.id;
-    const {connectionCode} = req.body
+    const connectionCode = req.body.connectionCode;
 
     try {
         const user = await User.findById(userId);
@@ -119,7 +119,7 @@ export const removeConnection = async (req, res) => {
         return res.status(200).json({message: " Removed connection successfully"});
     } catch (error) {
         console.error("Error in connectUser:", error);
-        return res.status(500).json({ error: "Internal server error" });
+        return res.status(500).json({ message: "Internal server error" });
     }
 }
 
@@ -158,6 +158,6 @@ export const deleteProfile = async (req, res) => {
         return res.status(200).json({ message: 'User deleted successfully' });
     } catch (error) {
         console.error('Delete user error:', error);
-        return res.status(500).json({ error: 'Internal server error' });
+        return res.status(500).json({ message: 'Internal server error' });
     }
 };

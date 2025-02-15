@@ -12,7 +12,7 @@ export const getUsersForSidebar = async (req, res) => {
         res.status(200).json({message: 'Users fetched successfully', users: user.connectedUsers })
     } catch (error) {
         console.log('Error in getUsersForSidebar: ', error.message)
-        res.status(500).json({error: "Internal server error"})
+        res.status(500).json({ message: "Internal server error"})
     }
 }
 
@@ -31,7 +31,7 @@ export const getMessagesForUser  = async (req, res) => {
         res.status(200).json({messages})
     } catch (error) {
         console.log('Error in getMessagesForUser controller: ',error.message)
-        return res.status(500).json({error: 'Internal server error'})
+        return res.status(500).json({ message: 'Internal server error'})
     }
 }
 
@@ -79,7 +79,7 @@ export const sendMessage = async (req, res) => {
 
     } catch (error) {
         console.log('Error in send message controller: ', error.message)
-        return res.status(500).json({error: "Internal server error"})
+        return res.status(500).json({ message: "Internal server error"})
     }
 }
 

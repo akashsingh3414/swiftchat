@@ -7,6 +7,7 @@ export const useSpaceStore = create((set, get) => ({
   spaces: [],
   selectedSpace: null,
   messages: [],
+  spaceMembers: [],
   isSpacesLoading: false,
   isMessagesLoading: false,
 
@@ -16,27 +17,55 @@ export const useSpaceStore = create((set, get) => ({
       const res = await axiosInstance.get("/space/spaces");
       set({ spaces: res.data.spaces });
     } catch (error) {
-      toast.error(error?.response?.data?.message || error.message);
+      toast.error(error.response?.data?.message || error.message);
     } finally {
       set({ isSpacesLoading: false });
     }
   },
 
-  createSpaces: async (spaceData) => {
+  createSpace: async (spaceName) => {
     try {
-      const res = await axiosInstance.post("/spaces/create", spaceData);
+      const res = await axiosInstance.post("/space/create", {spaceName} );
       set({ spaces: [...get().spaces, res.data.space] });
     } catch (error) {
-      toast.error(error?.response?.data?.message || error.message);
+      toast.error(error.response?.data?.message || error.message);
     }
   },
 
-  leaveSpaces: async (spaceCode) => {
+  joinSpace: async (spaceCode) => {
     try {
-      await axiosInstance.patch("/spaces/leave", { spaceCode });
-      set({ spaces: get().spaces.filter((space) => space.code !== spaceCode) });
+      const res = await axiosInstance.get(`/space/connect/${spaceCode}`)
+      set({ spaces: [...get().spaces, res.data.space] });
     } catch (error) {
-      toast.error(error?.response?.data?.message || error.message);
+      toast.error(error.response?.data?.message || error.message);
+    }
+  },
+
+  leaveSpace: async (spaceCode) => {
+      try {
+        set((state)=>({
+          spaces: state.spaces.filter(space=>space.spaceCode!=spaceCode),
+          selectedSpace: null
+        }));
+
+        await axiosInstance.patch('/space/leave', { spaceCode });
+
+      } catch (error) {
+        toast.error(error.response?.data?.message || error.message);
+      }
+  },
+  
+  deleteSpace: async (spaceId) => {
+    try {
+      await axiosInstance.delete("/space/delete", { data: { spaceId } });
+
+      set((state)=>({
+        spaces: state.spaces.filter(space=>space._id!=spaceId),
+        selectedSpace: null
+      }));
+
+    } catch (error) {
+      toast.error(error.response?.data?.message || error.message);
     }
   },
 
@@ -46,7 +75,7 @@ export const useSpaceStore = create((set, get) => ({
       const res = await axiosInstance.get(`/space/message/${spaceId}`);
       set({ messages: res.data.messages });
     } catch (error) {
-      toast.error(error?.response?.data?.message || error.message);
+      toast.error(error.response?.data?.message || error.message);
     } finally {
       set({ isMessagesLoading: false });
     }
@@ -72,8 +101,42 @@ export const useSpaceStore = create((set, get) => ({
       set({ messages: [...messages, res.data.message] });
 
     } catch (error) {
-      console.log('here')
-      toast.error(error?.response?.data?.message || error.message);
+      toast.error(error.response?.data?.message || error.message);
+    }
+  },
+  
+  getMembersForSpace: async (spaceId) => {
+    const {selectedSpace} = get();
+
+    if(!selectedSpace) return ;
+    try {
+      const res = await axiosInstance.get(`/space/getMembers/${spaceId}`)
+      set({
+        spaceMembers: res.data.members
+      });
+    } catch (error) {
+      toast.error(error.response?.data?.message || error.message);
+    }
+  },
+
+  toggleJoining: async (data) => {
+    try {
+      await axiosInstance.post('/space/modify-invite', {spaceId: data.spaceId, change: data.change})
+    } catch (error) {
+      toast.error(error.response?.data?.message || error.message);
+    }
+  },
+
+  deleteAllSpaceMessages: async (receiverId) => {
+    try {
+      const res = await axiosInstance.delete('space//message/delete-all', {data: {receiverId}})
+      if(res.status == 200) {
+        set({
+          messages: []
+        });
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || error.message);
     }
   },
 
@@ -96,15 +159,16 @@ export const useSpaceStore = create((set, get) => ({
   unsubscribeFromSpaceMessages: () => {
     const socket = useAuthStore.getState().socket;
     socket.off(`newGroupMessage`);
-},
+  },
 
-setSelectedSpace: (selectedSpace) => {
-  set({ selectedSpace });
-  if (selectedSpace) {
-    get().getMessagesFromSpace(selectedSpace._id);
+  setSelectedSpace: (selectedSpace) => {
+    set({ selectedSpace });
+    if (selectedSpace) {
+      get().getMessagesFromSpace(selectedSpace._id);
 
-    const socket = useAuthStore.getState().socket;
-    socket.emit("joinSpace", selectedSpace._id);
-  }
-}
+      const socket = useAuthStore.getState().socket;
+      socket.emit("joinSpace", selectedSpace._id);
+    }
+  },
+  
 }));
