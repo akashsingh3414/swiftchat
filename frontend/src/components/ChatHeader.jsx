@@ -49,7 +49,7 @@ const ChatHeader = () => {
   }, []);
 
   return (
-    <div className="px-4 border-b border-base-300 flex items-center justify-between bg-base-200 relative">
+    <div className="px-4 py-1 border-b border-base-300 flex items-center justify-between bg-base-200 relative">
       <div className="flex items-center gap-3">
         <div className="avatar">
           <div className="w-8 h-8 rounded-full">

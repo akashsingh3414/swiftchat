@@ -28,6 +28,9 @@ const userSchema = new mongoose.Schema({
         type: String,
         default: ''
     },
+    watchHistory: [{
+        type: String,
+    }],
     about: {
         type: String,
         default: ''

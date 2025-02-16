@@ -49,7 +49,7 @@ const InfoSkeleton = () => {
   if(!selectedSpace && !selectedUser) return null;
 
   return (
-    <div className="h-full w-64 flex flex-col bg-base-200">
+    <div className="h-full w-auto max-w-56 flex flex-col bg-base-200">
       {selectedUser ? (
         <div className="flex flex-col h-full items-center p-4">
           <div className="avatar">
@@ -59,14 +59,17 @@ const InfoSkeleton = () => {
           </div>
           <h2 className="text-xl font-semibold mt-4">{selectedUser.fullName}</h2>
           <p className="text-sm text-base-content/60">{selectedUser.connectionCode}</p>
+
+          <div className="divider"></div>
+
           {onlineUsers.includes(selectedUser._id) && (
             <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full" />
           )}
 
-          <p className="mt-4 text-sm text-center text-base-content/80">{selectedUser.about || "No bio available."}</p>
+          {selectedUser?.about && <p className="mt-2 text-sm text-center text-base-content/80">{selectedUser.about}</p>}
 
-          <div className="flex flex-col w-full gap-4 mt-6">
-            <button className="btn btn-primary btn-sm gap-2">
+          <div className="flex flex-col w-full gap-4 mt-2">
+            <button disabled={true} className="btn btn-primary btn-sm gap-2">
               <VideoIcon className="w-4 h-4" /> Video Call
             </button>
             <button className="btn btn-outline btn-sm text-red-500 border-red-500 hover:bg-red-500 hover:text-white flex items-center gap-2">
@@ -93,7 +96,7 @@ const InfoSkeleton = () => {
               <input onClick={handleToggleInvite} type="checkbox" checked={acceptInvite} className="toggle toggle-success rounded-full transition ease-in" />
             </div>
             <div className="flex flex-cols items-center justify-between gap-2">
-              <button className="btn btn-primary btn-sm gap-2 flex flex-grow">
+              <button disabled={true} className="btn btn-primary btn-sm gap-2 flex flex-grow">
                 <VideoIcon />
               </button>
               <button className="btn btn-outline btn-sm text-red-500 border-red-500 hover:bg-red-500 hover:text-white flex items-center gap-2">

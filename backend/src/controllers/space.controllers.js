@@ -59,7 +59,7 @@ export const connectToSpace = async (req, res) => {
         }
 
         if (space.members.includes(userId)) {
-            return res.status(400).json({ message: "User is already a member of this space" });
+            return res.status(400).json({ message: "You are already a member of this space" });
         }
 
         space.members.push(userId);

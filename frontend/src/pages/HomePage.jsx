@@ -4,6 +4,7 @@ import NoChatSelected from "../components/NoChatSelected";
 import ChatContainer from "../components/ChatContainer";
 import { useSpaceStore } from "../store/useSpaceStore";
 import InfoSkeleton from "../components/skeletons/InfoSkeleton";
+import WatchHistory from "../components/WatchHistory";
 
 const HomePage = () => {
   const { selectedUser } = useChatStore();
@@ -16,7 +17,10 @@ const HomePage = () => {
           <div className="flex h-full overflow-hidden">
             <Sidebar />
             <InfoSkeleton />
-            {!selectedUser && !selectedSpace ? <NoChatSelected /> : <ChatContainer />}
+            {!selectedUser && !selectedSpace ? <NoChatSelected /> : <>
+              <ChatContainer />
+              <WatchHistory />
+            </>}
           </div>
         </div>
       </div>

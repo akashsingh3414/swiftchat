@@ -7,9 +7,9 @@ const NoChatSelected = () => {
 
   const {createSpace, joinSpace} = useSpaceStore()
   const {addConnection} = useChatStore()
-  const [connectStart, setConnectStart] = useState(false)
-  const [createStart, setCreateStart] = useState(false)
-  const [joinStart, setJoinStart] = useState(false)
+  const [connect, setConnect] = useState(false)
+  const [create, setCreate] = useState(false)
+  const [join, setJoin] = useState(false)
   const name = useRef();
   const spaceCodeRef = useRef();
   const connectionCodeRef = useRef();
@@ -17,12 +17,12 @@ const NoChatSelected = () => {
   return (
     <div className="w-full h-screen bg-base-100 flex flex-col">
       
-      <div className="w-full flex items-center gap-3 p-3 border-b border-base-300 bg-base-200">
+      <div className="w-full flex flex-col lg:flex-row items-left gap-2 p-3 border-b border-base-300 bg-base-200">
 
-        <div className="flex items-center gap-2 mx-1">
-          {connectStart && (
+        <div className="flex items-center gap-2">
+          {connect && (
             <input
-              className="input input-sm bg-base-100 text-white px-3 py-1 rounded-md outline outline-1 w-full"
+              className="input input-sm bg-base-100 text-primary min-w-[15rem] px-3 py-1 rounded-md outline outline-1"
               placeholder="Enter Connection Code"
               ref={connectionCodeRef}
             />
@@ -30,30 +30,30 @@ const NoChatSelected = () => {
           
           <button
             onClick={() => {
-              if (connectStart && connectionCodeRef?.current?.value) {
+              if (connect && connectionCodeRef?.current?.value) {
                 addConnection(connectionCodeRef.current.value);
               }
               
-              setConnectStart(!connectStart);
-              setCreateStart(false);
-              setJoinStart(false);
+              setConnect(!connect);
+              setCreate(false);
+              setJoin(false);
             }}
-            className={`btn btn-sm flex items-center gap-2 rounded-md px-3 py-1 
-              ${connectStart ? "btn-success mr-2" : "btn-secondary"}`}
+            className={`btn btn-sm w-full md:w-auto max-w-[15rem] flex items-center gap-2 rounded-md px-3 py-1 
+              ${connect ? "btn-success mr-2 w-auto" : "btn-secondary"}`}
           >
-            {connectStart ? "Done" : (
+            {connect ? "Done" : (
               <>
-                <User className="w-4 h-4 hidden sm:inline" />
+                <User className="w-4 h-4 hidden md:inline" />
                 Connect To Users
               </>
             )}
           </button>
         </div>
 
-        <div className="flex items-center gap-2 mx-1">
-          {createStart && (
+        <div className="flex items-center gap-2 ">
+          {create && (
             <input
-              className="input input-sm bg-base-100 text-white px-3 py-1 ml-2 rounded-md outline outline-1 w-full"
+              className="input input-sm bg-base-100 text-primary min-w-[15rem] px-3 py-1 ml-2 rounded-md outline outline-1"
               placeholder="Enter Space Name"
               ref={name}
             />
@@ -61,51 +61,51 @@ const NoChatSelected = () => {
           
           <button
             onClick={() => {
-              if (createStart && name?.current?.value) {
+              if (create && name?.current?.value) {
                 createSpace(name.current.value);
               } 
               
-              setConnectStart(false);
-              setCreateStart(!createStart);
-              setJoinStart(false);
+              setConnect(false);
+              setCreate(!create);
+              setJoin(false);
             }}
-            className={`btn btn-sm flex items-center gap-2 rounded-md px-3 py-1 
-              ${createStart ? "btn-success" : "btn-secondary"}`}
+            className={`btn btn-sm w-full md:w-auto max-w-[15rem] flex items-center gap-2 rounded-md px-3 py-1 
+              ${create ? "btn-success w-auto" : "btn-secondary"}`}
           >
-            {createStart ? "Done" : (
+            {create ? "Done" : (
               <>
-                <Plus className="w-4 h-4 hidden sm:inline" />
+                <Plus className="w-4 h-4 hidden md:inline" />
                 Create Your Spaces
               </>
             )}
           </button>
         </div>
 
-        <div className="flex items-center gap-2 mx-1">
-          {joinStart && (
+        <div className="flex items-center gap-2 ">
+          {join && (
             <input
-              className="input input-sm bg-base-100 text-white px-3 py-1 ml-2 rounded-md outline outline-1 w-full"
+              className="input input-sm bg-base-100 text-primary min-w-[15rem] px-3 py-1 ml-2 rounded-md outline outline-1"
               placeholder="Enter Space Name"
-              ref={name}
+              ref={spaceCodeRef}
             />
           )}
           
           <button
-            onClick={() => {
-              if (joinStart && spaceCodeRef?.current?.value) {
-                createSpace(spaceCodeRef.current.value);
+            onClick={() => { 
+              if (join && spaceCodeRef?.current?.value) {
+                joinSpace(spaceCodeRef.current.value);
               } 
-              
-              setConnectStart(false);
-              setCreateStart(false);
-              setJoinStart(!joinStart);
+
+              setConnect(false);
+              setCreate(false);
+              setJoin(!join);
             }}
-            className={`btn btn-sm flex items-center gap-2 rounded-md px-3 py-1 
-              ${joinStart ? "btn-success" : "btn-secondary"}`}
+            className={`btn btn-sm flex w-full md:w-auto max-w-[15rem] items-center gap-2 rounded-md px-3 py-1 
+              ${join ? "btn-success w-auto" : "btn-secondary"}`}
           >
-            {joinStart ? "Done" : (
+            {join ? "Done" : (
               <>
-                <Users className="w-4 h-4 hidden sm:inline" />
+                <Users className="w-4 h-4 hidden md:inline" />
                 Join Spaces
               </>
             )}
@@ -124,7 +124,7 @@ const NoChatSelected = () => {
 
           <h2 className="text-2xl font-bold">Welcome to SwiftChat!</h2>
           <p className="text-base-content/60">
-            Select a conversation from the sidebar or start a new connection.
+            Select a conversation from the sidebar or  a new connection.
           </p>
         </div>
       </div>

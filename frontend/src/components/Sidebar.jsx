@@ -31,11 +31,11 @@ const Sidebar = () => {
 
   return (
     <aside
-      className={`h-full flex flex-col px-1 py-1 transition-all duration-300 ${
+      className={`flex flex-col px-1 py-1 transition-all duration-300 overflow-x-hidden overflow-y-auto ${
         isExpanded ? "w-48 border-r border-base-300 bg-base-200" : "w-16"
       }`}
     >
-      {isExpanded && <div className="flex items-center justify-center px-2 mb-1 border-b border-base-300 text-primary font-semibold">Connections ({combinedList.length})</div>}
+      {isExpanded && <div className="flex items-center justify-begin px-2 mb-1 border-b border-base-300 text-primary font-semibold">Connections ({combinedList.length})</div>}
       {combinedList.map((item) => {
         const isSpace = item?.members !== undefined;
         const isSelected = isSpace ? selectedSpace?._id === item?._id : selectedUser?._id === item?._id;
@@ -60,7 +60,7 @@ const Sidebar = () => {
               </div>
 
               {isExpanded && (
-                <span className="text-base-900 font-semibold text-md">
+                <span className="text-base-900 font-semibold text-lg px-2">
                   {isSpace
                     ? item?.name.length > 10
                       ? item?.name.slice(0, 10) + "..."

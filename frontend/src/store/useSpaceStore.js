@@ -7,6 +7,7 @@ export const useSpaceStore = create((set, get) => ({
   spaces: [],
   selectedSpace: null,
   messages: [],
+  spaceWatchHistory: [],
   spaceMembers: [],
   isSpacesLoading: false,
   isMessagesLoading: false,
@@ -27,6 +28,7 @@ export const useSpaceStore = create((set, get) => ({
     try {
       const res = await axiosInstance.post("/space/create", {spaceName} );
       set({ spaces: [...get().spaces, res.data.space] });
+      toast.success(`Created ${res.data.space.name} successfully`)
     } catch (error) {
       toast.error(error.response?.data?.message || error.message);
     }
@@ -36,6 +38,7 @@ export const useSpaceStore = create((set, get) => ({
     try {
       const res = await axiosInstance.get(`/space/connect/${spaceCode}`)
       set({ spaces: [...get().spaces, res.data.space] });
+      toast.success(`Joined ${res.data.space.name} successfully`)
     } catch (error) {
       toast.error(error.response?.data?.message || error.message);
     }

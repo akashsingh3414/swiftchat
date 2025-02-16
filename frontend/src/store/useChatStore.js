@@ -3,11 +3,10 @@ import { toast } from "sonner";
 import { axiosInstance } from "../lib/axios";
 import { useAuthStore } from "./useAuthStore";
 
-
-
 export const useChatStore = create((set, get) => ({
   messages: [],
   users: [],
+  userWatchHistory: [],
   selectedUser: null,
   isUsersLoading: false,
   isMessagesLoading: false,
@@ -61,6 +60,7 @@ export const useChatStore = create((set, get) => ({
     try {
       const res = await axiosInstance.get(`/user/connect/${connectionCode}`)
       set({users: [...get().users, res.data.user]})
+      toast.success(`${res.data.user.fullName} added to your connections`)
     } catch (error) {
       toast.error(error.response?.data?.message || error.message);
     }
@@ -73,6 +73,7 @@ export const useChatStore = create((set, get) => ({
         users: state.users.filter(user=>user.connectionCode!=connectionCode),
         selectedUser: null
       }))
+      toast.success(`User removed from your connections`)
     } catch (error) {
       toast.error(error.response?.data?.message || error.message);
     }

@@ -18,6 +18,9 @@ const spaceSchema = new mongoose.Schema({
         required: true,
         unique: true,
     },
+    watchHistory: [{
+        type: String,
+    }],
     acceptingInvites: {
         type: Boolean,
         required: true,
