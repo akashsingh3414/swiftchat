@@ -220,7 +220,22 @@ export const getMembersForSpace = async (req, res) => {
     
         res.status(200).json({message:'Members fetched successfully', members});
     } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Internal Server Error" });
+        console.error(error);
+        return res.status(500).json({ message: "Internal Server Error" });
     }
 };
+
+export const spaceWatchHistory = async (req, res) => {
+    const spaceId = req.body.spaceId;
+
+    try {
+        const space = await Space.findById(spaceId)
+        if(!space) {
+            return res.status(404).json({message: "Space not found. Invalid Space Id"})
+        }
+        return res.status(200).json({watchHistory: space.watchHistory})
+    } catch (error) {
+        console.log('Error in spaceWatchHistory controller', error)
+        return res.status(500).json({ message: "Internal Server Error" });
+    }
+}

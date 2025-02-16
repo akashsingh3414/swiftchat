@@ -122,6 +122,17 @@ export const useSpaceStore = create((set, get) => ({
     }
   },
 
+  getSpaceWatchHistory: async (spaceId) => {
+    try {
+      const res = await axiosInstance.post('/space/watch-history', {spaceId})
+      set({
+        spaceWatchHistory: res.data.watchHistory
+      })
+    } catch (error) {
+      toast.error(error.response?.data?.message || error.message);
+    }
+  },
+
   toggleJoining: async (data) => {
     try {
       await axiosInstance.post('/space/modify-invite', {spaceId: data.spaceId, change: data.change})

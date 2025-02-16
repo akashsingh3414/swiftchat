@@ -56,6 +56,17 @@ export const useChatStore = create((set, get) => ({
     }
   },
 
+  getUserWatchHistory: async (userId) => {
+    try {
+      const res = await axiosInstance.post('/user/watch-history', {userId})
+      set({
+        userWatchHistory: res.data.watchHistory
+      })
+    } catch (error) {
+      toast.error(error.response?.data?.message || error.message);
+    }
+  },
+
   addConnection: async (connectionCode) => {
     try {
       const res = await axiosInstance.get(`/user/connect/${connectionCode}`)

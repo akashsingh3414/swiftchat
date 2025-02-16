@@ -18,16 +18,29 @@ const spaceSchema = new mongoose.Schema({
         required: true,
         unique: true,
     },
-    watchHistory: [{
-        type: String,
-    }],
+    watchHistory: {
+        type: [{
+            title: {
+                type: String,
+                required: true
+            },
+            url: {
+                type: String,
+                required: true
+            }
+        }],
+        // default: [{
+        //     title: "Default Video",
+        //     url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+        // }]
+    },
     acceptingInvites: {
         type: Boolean,
         required: true,
         default: true,
     }
-}, {timestamps: true})
+}, { timestamps: true });
 
-const Space = mongoose.model('Space', spaceSchema)
+const Space = mongoose.model('Space', spaceSchema);
 
 export default Space;
