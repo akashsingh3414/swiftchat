@@ -17,8 +17,8 @@ const WatchHistory = () => {
   },[selectedSpace, selectedUser])
 
   return (
-    <div className='p-1 border-l w-full max-w-[15rem] border-base-200 hidden lg:block flex flex-col'>
-      <div className='border-b border-base-300 py-2 font-semibold px-4'>Watch History</div>
+    <div className='p-1 border-l w-full max-w-[15rem] border-base-200 bg-base-200/90 hidden lg:block flex flex-col'>
+      <div className='border-b border-base-600 py-2 font-semibold px-4'>Watch History</div>
       <div>
         {watchHistory.length === 0 ? <span className='px-4'>Nothing to show here</span> : <div>
           {watchHistory.map((history, index)=>(

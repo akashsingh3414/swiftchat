@@ -1,17 +1,25 @@
 import { Trash2, VideoIcon, Youtube } from "lucide-react"
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useChatStore } from "../../store/useChatStore"
 import { useSpaceStore } from "../../store/useSpaceStore"
 import { useAuthStore } from "../../store/useAuthStore"
 
 const InfoSkeleton = () => {
   const { getUsers, selectedUser, removeConnection } = useChatStore()
-  const { getSpaces, selectedSpace, spaceMembers, getMembersForSpace, leaveSpace, deleteSpace, toggleJoining } = useSpaceStore()
+  const { getSpaces, selectedSpace, spaceMembers, getMembersForSpace, leaveSpace, deleteSpace, toggleJoining, removeUserFromSpace} = useSpaceStore()
   const { onlineUsers, authUser } = useAuthStore()
   const [acceptInvite, setAcceptInvite] = useState(selectedSpace?.acceptingInvites);
 
   const handleRemoveUser = () => {
     removeConnection(selectedUser.connectionCode)
+  }
+
+  const handleUserRemovalFromSpace = (userId) => {
+    const data = {
+      spaceId: selectedSpace._id,
+      userId: userId,
+    }
+    removeUserFromSpace(data);
   }
 
   const handleLeaveSpace = () => {
@@ -49,7 +57,7 @@ const InfoSkeleton = () => {
   if(!selectedSpace && !selectedUser) return null;
 
   return (
-    <div className="h-full w-auto max-w-56 flex flex-col bg-base-200">
+    <div className="h-full w-full max-w-64 flex flex-col bg-base-200">
       {selectedUser ? (
         <div className="flex flex-col h-full items-center p-4">
           <div className="avatar">
@@ -82,7 +90,7 @@ const InfoSkeleton = () => {
         <div className="flex flex-col h-full items-center p-4">
           <div className="avatar">
             <div className="w-24 rounded-full">
-              <img src={selectedSpace.creator?.profilePic || "/avatar.png"} alt={selectedSpace.name} />
+              <img src={selectedSpace?.image || "/avatar.png"} alt={selectedSpace.name} />
             </div>
           </div>
           <h2 className="text-xl font-semibold mt-4">{selectedSpace.name}</h2>
@@ -129,8 +137,9 @@ const InfoSkeleton = () => {
                     <p className="text-sm font-medium">{member.fullName}</p>
                     <p className="text-xs text-base-content/60">{member.connectionCode}</p>
                   </div>
+                  {(selectedSpace.creator === authUser._id) && (member._id !== selectedSpace.creator) && <button onClick={()=>handleUserRemovalFromSpace(member._id)} className="btn btn-sm btn-secondary btn-outline ml-auto mr-0 px-1 text-xs">Remove</button>}
                   {member._id === selectedSpace.creator && <span className="text-xs text-base-content/60 ml-auto">Admin</span>}
-                  {member._id === authUser._id && <span className="text-xs text-base-content/60 ml-auto">You</span>}
+                  {(member._id === authUser._id) && (member._id !== selectedSpace.creator) && <span className="text-xs text-base-content/60 ml-auto">You</span>}
                 </div>
               ))
             ) : (

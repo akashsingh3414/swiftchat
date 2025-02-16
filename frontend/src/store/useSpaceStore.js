@@ -141,6 +141,17 @@ export const useSpaceStore = create((set, get) => ({
     }
   },
 
+  removeUserFromSpace: async (data) => {
+    try {
+      const res = await axiosInstance.delete('/space/remove-user', { data: {userId: data.userId, spaceId: data.spaceId} })
+      set((state)=>({
+        spaceMembers: state.spaceMembers.filter(member=>member._id!=data.userId),
+      }))
+    } catch (error) {
+      toast.error(error.response?.data?.message || error.message);
+    }
+  },
+
   deleteAllSpaceMessages: async (receiverId) => {
     try {
       const res = await axiosInstance.delete('space//message/delete-all', {data: {receiverId}})

@@ -105,7 +105,7 @@ export const leaveSpace = async (req, res) => {
         user.spaces = user.spaces.filter(id => id.toString() !== space._id.toString());
         await user.save();
 
-        if(space.members.length === 0 || space.creator == userId) {
+        if(space.members.length === 0 || space.creator.toString() == userId) {
             await Message.deleteMany({spaceId: space._id});
             await Space.findByIdAndDelete(space._id);
             return res.status(200).json({message: "Space deleted"})
@@ -238,4 +238,39 @@ export const spaceWatchHistory = async (req, res) => {
         console.log('Error in spaceWatchHistory controller', error)
         return res.status(500).json({ message: "Internal Server Error" });
     }
-}
+};
+
+export const removeFromSpace = async (req, res) => {
+    const userId = req.user.id;
+    const targetUserId = req.body.userId
+    const spaceId = req.body.spaceId
+
+    try {
+        const admin = await User.findById(userId);
+        const user = await User.findById(targetUserId);
+
+        if(!user || !admin) {
+            return res.status(400).json({message: "Invalid user id"});
+        }
+
+        const space = await Space.findById(spaceId);
+        if(!space) {
+            return res.status(400).json({message: "Invalid space id"})
+        }
+
+        if(space.creator.toString() !== userId) {
+            return res.status(403).json({message: "Action not allowed to non-admins"})
+        }
+
+        space.members = space.members.filter(member => member._id != targetUserId);
+        user.spaces = user.spaces.filter(space => space._id != spaceId);
+
+        await space.save();
+        await user.save();
+
+        return res.status(200).json({message: "User removed successfully", space});
+    } catch (error) {
+        console.log('Error occurred at removeFromSpace controller', error)
+        return res.status(500).json({ message: "Internal Server Error" });
+    }
+};
