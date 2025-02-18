@@ -27,7 +27,6 @@ app.use('/api/user', userRouter)
 app.use('/api/space', spaceRouter)
 
 const PORT = process.env.PORT || 5001
-
 server.listen(PORT, () => {
     console.log('Server is running at port: ', PORT)
     connectDB()

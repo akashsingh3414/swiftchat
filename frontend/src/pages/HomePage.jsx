@@ -8,7 +8,7 @@ import WatchHistory from "../components/WatchHistory";
 
 const HomePage = () => {
   const { selectedUser } = useChatStore();
-  const { selectedSpace } = useSpaceStore()
+  const { selectedSpace } = useSpaceStore();
 
   return (
     <div className="h-screen bg-base-200">
