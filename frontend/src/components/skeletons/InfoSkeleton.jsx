@@ -10,74 +10,64 @@ const InfoSkeleton = () => {
   const { getUsers, selectedUser, removeConnection } = useChatStore();
   const { getSpaces, selectedSpace, spaceMembers, getMembersForSpace, leaveSpace, deleteSpace, toggleJoining, removeUserFromSpace } = useSpaceStore();
   const { onlineUsers, authUser } = useAuthStore();
+  const { roomId, joinRoom, createRoom, initPeer, remotePeerId, isInCall, listenForUserJoined, listenForNewRoom } = useVideoStore();
+
   const [acceptInvite, setAcceptInvite] = useState(selectedSpace?.acceptingInvites);
-  const { roomId, listenForNewRoom, listenForUserJoined, joinRoom, createRoom } = useVideoStore();
-  const [readyVC, setReadyVC] = useState(false);
   const navigate = useNavigate();
 
-  const handleRemoveUser = () => {
-    removeConnection(selectedUser.connectionCode);
-  };
+  const handleRemoveUser = () => removeConnection(selectedUser.connectionCode);
 
   const handleUserRemovalFromSpace = (userId) => {
-    const data = {
-      spaceId: selectedSpace._id,
-      userId: userId,
-    };
-    removeUserFromSpace(data);
-  };
-
-  useEffect(() => {
-    listenForNewRoom();
-    listenForUserJoined();
-
-    if (readyVC) {
-      navigate(`/vc/${roomId}`);
-    }
-  }, [roomId, readyVC]);
-
-  const handleVideoCall = () => {
-    setReadyVC(true);
-    listenForNewRoom();
-    listenForUserJoined();
-
-    if (!roomId) {  
-        const newRoomId = createRoom(selectedUser);
-        navigate(`/vc/${newRoomId}`);
-    } else {
-        joinRoom(roomId, selectedUser);
-        navigate(`/vc/${roomId}`);
-    }
-  };
-
-  const handleLeaveSpace = () => {
-    leaveSpace(selectedSpace.spaceCode);
-  };
-
-  const handleDeleteSpaces = () => {
-    deleteSpace(selectedSpace._id);
-  };
-
-  const handleToggleInvite = async () => {
-    try {
-      await toggleJoining({ spaceId: selectedSpace._id, change: !acceptInvite });
-      setAcceptInvite(!acceptInvite);
-    } catch (error) {
-      console.error("Failed to toggle invite status", error);
-    }
+    removeUserFromSpace({ spaceId: selectedSpace._id, userId });
   };
 
   useEffect(() => {
     getUsers();
     getSpaces();
-  }, [getUsers, getSpaces]);
+  }, []);
 
   useEffect(() => {
     if (selectedSpace) {
       getMembersForSpace(selectedSpace._id);
       setAcceptInvite(selectedSpace.acceptingInvites);
     }
-  }, [selectedSpace, getMembersForSpace]);
+  }, [selectedSpace]);
+
+  const handleVideoCall = async () => {
+    try {
+      listenForUserJoined()
+      listenForNewRoom()
+      await initPeer();
+  
+      if (!remotePeerId && !roomId) {
+        console.log('Creating new room...');
+        const newRoomId = await createRoom(selectedUser);
+        if (!newRoomId) {
+          console.error('Room creation failed.');
+          return;
+        }
+        navigate('/vc')
+      } else if (roomId) {
+        console.log('Joining existing room...');
+        joinRoom(roomId, selectedUser);
+        navigate('/vc')
+      }
+    } catch (error) {
+      console.error("Video call initiation failed:", error);
+    }
+  };
+
+  const handleLeaveSpace = () => leaveSpace(selectedSpace.spaceCode);
+  const handleDeleteSpaces = () => deleteSpace(selectedSpace._id);
+
+  const handleToggleInvite = async () => {
+    try {
+      await toggleJoining({ spaceId: selectedSpace._id, change: !acceptInvite });
+      setAcceptInvite((prev) => !prev);
+    } catch (error) {
+      console.error("Failed to toggle invite status", error);
+    }
+  };
 
   if (!selectedSpace && !selectedUser) return null;
 
@@ -95,15 +85,15 @@ const InfoSkeleton = () => {
 
           <div className="divider"></div>
 
-          {selectedUser?.about && <p className="mt-2 text-sm text-center text-base-content/80">{selectedUser.about}</p>}
+          {selectedUser?.about && <p className="text-sm text-center text-base-content/80">{selectedUser.about}</p>}
 
-          <div className="flex flex-col w-full gap-4 mt-2">
-            <button onClick={handleVideoCall} className={`btn btn-primary btn-sm gap-2 ${roomId ? "bg-green-500" : "bg-red-500"}`}>
+          <div className="flex flex-col w-full gap-4 mt-4">
+            <button onClick={handleVideoCall} className={`btn btn-primary btn-sm gap-2 ${isInCall || roomId ? "btn-success" : ""}`}>
               <VideoIcon className="w-4 h-4" /> Video Call
             </button>
             <button className="btn btn-outline btn-sm text-red-500 border-red-500 hover:bg-red-500 hover:text-white flex items-center gap-2">
-                <Youtube /> Sync Watch
-            </button>            
+              <Youtube /> Sync Watch
+            </button>
             <button onClick={handleRemoveUser} className="btn btn-error btn-sm mt-4">Remove Connection</button>
           </div>
         </div>
@@ -120,19 +110,21 @@ const InfoSkeleton = () => {
           <div className="divider mt-5"></div>
 
           <div className="flex flex-col w-full gap-2">
-            <div className="flex flex-row items-center justify-between gap-2">
+            <div className="flex justify-between items-center">
               <span className="font-semibold">Enable Joining</span>
-              <input onClick={handleToggleInvite} type="checkbox" checked={acceptInvite} className="toggle toggle-success rounded-full transition ease-in" />
+              <input type="checkbox" checked={acceptInvite} onChange={handleToggleInvite} className="toggle toggle-success rounded-full" />
             </div>
+
             <button className="btn btn-outline btn-sm w-full text-red-500 border-red-500 hover:bg-red-500 hover:text-white flex items-center gap-2">
               <Youtube /> Sync Watch
             </button>
 
             <div className="flex justify-center gap-2">
-              <button className="btn btn-secondary btn-sm flex flex-grow" onClick={handleLeaveSpace}>Leave Space</button>
-              
+              <button onClick={handleLeaveSpace} className="btn btn-secondary btn-sm flex-grow">Leave Space</button>
               {selectedSpace.creator === authUser._id && (
-                <button onClick={handleDeleteSpaces} className="btn btn-error btn-sm w-auto btn-outline px-1"><Trash2 className="w-4 h-4" />Delete Space</button>
+                <button onClick={handleDeleteSpaces} className="btn btn-error btn-sm btn-outline flex items-center gap-1 px-2">
+                  <Trash2 className="w-4 h-4" /> Delete Space
+                </button>
               )}
             </div>
           </div>
@@ -140,10 +132,10 @@ const InfoSkeleton = () => {
           <div className="divider my-4">Members ({spaceMembers?.length || 0})</div>
 
           <div className="w-full overflow-y-auto flex-grow">
-            {spaceMembers?.length > 0 ? (
+            {spaceMembers?.length ? (
               spaceMembers.map((member) => (
                 <div key={member._id} className="flex items-center gap-3 py-2 hover:bg-base-300 rounded-lg px-2">
-                  <div className="avatar">
+                  <div className="avatar relative">
                     <div className="w-8 h-8 rounded-full">
                       <img src={member.profilePic || "/avatar.png"} alt={member.fullName} />
                     </div>
@@ -151,23 +143,23 @@ const InfoSkeleton = () => {
                       <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full" />
                     )}
                   </div>
-                  <div>
+                  <div className="flex-grow">
                     <p className="text-sm font-medium">{member.fullName}</p>
                     <p className="text-xs text-base-content/60">{member.connectionCode}</p>
                   </div>
-                  {(selectedSpace.creator === authUser._id) && (member._id !== selectedSpace.creator) && <button onClick={()=>handleUserRemovalFromSpace(member._id)} className="btn btn-sm btn-secondary btn-outline ml-auto mr-0 px-1 text-xs">Remove</button>}
-                  {member._id === selectedSpace.creator && <span className="text-xs text-base-content/60 ml-auto">Admin</span>}
-                  {(member._id === authUser._id) && (member._id !== selectedSpace.creator) && <span className="text-xs text-base-content/60 ml-auto">You</span>}
+                  {selectedSpace.creator === authUser._id && member._id !== selectedSpace.creator && (
+                    <button onClick={() => handleUserRemovalFromSpace(member._id)} className="btn btn-sm btn-secondary btn-outline text-xs px-2">Remove</button>
+                  )}
+                  {member._id === selectedSpace.creator && <span className="text-xs text-base-content/60">Admin</span>}
+                  {member._id === authUser._id && member._id !== selectedSpace.creator && <span className="text-xs text-base-content/60">You</span>}
                 </div>
               ))
             ) : (
-              <p className="text-base-content/60 text-sm text-center">No members found.</p>
+              <p className="text-sm text-center text-base-content/60">No members found.</p>
             )}
           </div>
         </div>
-      ) : (
-        <></>
-      )}
+      ) : null}
     </div>
   );
 };

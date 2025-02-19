@@ -8,8 +8,13 @@ import cors from 'cors'
 import { app, server } from './lib/socket.js'
 import userRouter from './routes/user.routes.js'
 import spaceRouter from './routes/space.routes.js'
+import { ExpressPeerServer } from 'peer'
 
 dotenv.config()
+
+const peerServer = ExpressPeerServer(server, {
+    debug: true
+})
 
 app.use(express.json())
 app.use(cookieParser())
@@ -25,6 +30,7 @@ app.use('/api/auth', authRouter)
 app.use('/api/message', messageRouter)
 app.use('/api/user', userRouter)
 app.use('/api/space', spaceRouter)
+app.use('/peerjs', peerServer);
 
 const PORT = process.env.PORT || 5001
 server.listen(PORT, () => {
