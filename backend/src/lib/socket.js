@@ -28,31 +28,24 @@ io.on('connection', (socket) => {
 
   io.emit('getOnlineUsers', Object.keys(userSocketMap));
 
-  socket.on('create-vc-room', ({ roomId, receiver, myPeerId }) => {
-    socket.join(roomId);
-    console.log(`User ${socket.id} created room ${roomId}`);
-
+  socket.on('create-vc-room', ({ receiver, myPeerId }) => {
     const receiverSocketId = getReceiverSocketId(receiver._id);
     try {
-      socket.to(receiverSocketId).emit('new-vc-room', { roomId, remotePeerId: myPeerId, receiver });
+      socket.to(receiverSocketId).emit('new-vc-room', { remotePeerId: myPeerId, receiver });
     } catch (error) {
       console.log('Receiver is not online')
     }
-    return roomId;
   });
 
-  socket.on('join-vc-room', ({ roomId, receiver, myPeerId }) => {
-    socket.join(roomId);
-    console.log(`User ${socket.id} joined room ${roomId}`);
+  socket.on('join-vc-room', ({ receiver, myPeerId }) => {
     const receiverSocketId = getReceiverSocketId(receiver._id);
-    socket.to(receiverSocketId).emit('joined-vc-room', { roomId, remotePeerId: myPeerId });
+    socket.to(receiverSocketId).emit('joined-vc-room', { remotePeerId: myPeerId });
   });
 
-  socket.on('leave-vc-room', (roomId, receiver) => {
+  socket.on('leave-vc-room', ( receiver) => {
     try {
-      console.log(`User ${socket.id} left room ${roomId}`);
-      socket.leave(roomId);
-      io.to(roomId).emit('user-disconnected', receiver);
+      const receiverSocketId = getReceiverSocketId(receiver._id);
+      socket.to(receiverSocketId).emit('user-disconnected', receiver);
     } catch (error) {
       console.error('Error in leave-vc-room:', error);
     }

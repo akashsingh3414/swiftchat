@@ -10,7 +10,7 @@ const InfoSkeleton = () => {
   const { getUsers, selectedUser, removeConnection } = useChatStore();
   const { getSpaces, selectedSpace, spaceMembers, getMembersForSpace, leaveSpace, deleteSpace, toggleJoining, removeUserFromSpace } = useSpaceStore();
   const { onlineUsers, authUser } = useAuthStore();
-  const { roomId, joinRoom, createRoom, initPeer, remotePeerId, isInCall, listenForUserJoined, listenForNewRoom } = useVideoStore();
+  const { joinRoom, createRoom, initPeer, remotePeerId, isInCall, listenForUserJoined, listenForNewRoom, myPeerId } = useVideoStore();
 
   const [acceptInvite, setAcceptInvite] = useState(selectedSpace?.acceptingInvites);
   const navigate = useNavigate();
@@ -39,17 +39,11 @@ const InfoSkeleton = () => {
       listenForNewRoom()
       await initPeer();
   
-      if (!remotePeerId && !roomId) {
-        console.log('Creating new room...');
-        const newRoomId = await createRoom(selectedUser);
-        if (!newRoomId) {
-          console.error('Room creation failed.');
-          return;
-        }
+      if (!remotePeerId) {
+        await createRoom(selectedUser);
         navigate('/vc')
-      } else if (roomId) {
-        console.log('Joining existing room...');
-        joinRoom(roomId, selectedUser);
+      } else {
+        joinRoom(selectedUser);
         navigate('/vc')
       }
     } catch (error) {
@@ -88,7 +82,7 @@ const InfoSkeleton = () => {
           {selectedUser?.about && <p className="text-sm text-center text-base-content/80">{selectedUser.about}</p>}
 
           <div className="flex flex-col w-full gap-4 mt-4">
-            <button onClick={handleVideoCall} className={`btn btn-primary btn-sm gap-2 ${isInCall || roomId ? "btn-success" : ""}`}>
+            <button onClick={handleVideoCall} className={`btn btn-primary btn-sm gap-2 ${isInCall || myPeerId ? "btn-success" : ""}`}>
               <VideoIcon className="w-4 h-4" /> Video Call
             </button>
             <button className="btn btn-outline btn-sm text-red-500 border-red-500 hover:bg-red-500 hover:text-white flex items-center gap-2">

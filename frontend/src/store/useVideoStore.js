@@ -5,7 +5,6 @@ import { v4 as uuid } from 'uuid';
 import Peer from 'peerjs';
 
 export const useVideoStore = create((set, get) => ({
-  roomId: null,
   isInCall: false,
   peer: null,
   myPeerId: null,
@@ -41,7 +40,7 @@ export const useVideoStore = create((set, get) => ({
   },
 
   createRoom: async (receiver) => {
-    const { myPeerId, roomId: existingRoomId } = get();
+    const { myPeerId } = get();
     if (!myPeerId) {
       toast.error('Peer ID not initialized.');
       return null;
@@ -53,17 +52,14 @@ export const useVideoStore = create((set, get) => ({
       toast.error('Socket connection issue.');
       return null;
     }
-  
-    const roomId = existingRoomId || uuid();
-  
+    
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
   
-      set({ localStream: stream, roomId, isInCall: true });
+      set({ localStream: stream, isInCall: true });
   
-      socket.emit('create-vc-room', { roomId, receiver, myPeerId }); 
+      socket.emit('create-vc-room', { receiver, myPeerId }); 
       get().listenForDisconnection(); 
-      return roomId;
     } catch (err) {
       console.error('Error while initializing video stream:', err);
       toast.error('Could not access camera or microphone.');
@@ -80,27 +76,26 @@ export const useVideoStore = create((set, get) => ({
   
     socket.off('new-vc-room'); 
   
-    socket.on('new-vc-room', ({ roomId, remotePeerId, receiver }) => {
-      console.log('Received new-vc-room event:', { roomId, remotePeerId });
-          
+    socket.on('new-vc-room', ({ remotePeerId, receiver }) => {
+
       toast.info(`${receiver.fullName} wants to connect you over video call`);
 
-      set({ roomId, isInCall: true, remotePeerId });
+      set({ isInCall: true, remotePeerId });
     });
   },
 
-  joinRoom: (roomId, receiver) => {
+  joinRoom: (receiver) => {
     const { myPeerId } = get();
 
-    if (!roomId || !myPeerId) {
-      toast.error('Missing room ID or Peer ID.');
+    if (!myPeerId) {
+      toast.error('Missing Peer ID.');
       return;
     }
 
     const socket = useAuthStore.getState().socket;
-    socket.emit('join-vc-room', { roomId, receiver, myPeerId });
+    socket.emit('join-vc-room', { receiver, myPeerId });
     get().listenForDisconnection();
-    set({ roomId, isInCall: true });
+    set({ isInCall: true });
   },
 
   listenForUserJoined: () => {
@@ -108,8 +103,8 @@ export const useVideoStore = create((set, get) => ({
     const { peer, localStream } = get();
   
     socket.off('joined-vc-room');
-    socket.on('joined-vc-room', ({ roomId, remotePeerId }) => {
-      set({ roomId, remotePeerId, isInCall: true });
+    socket.on('joined-vc-room', ({ remotePeerId }) => {
+      set({ remotePeerId, isInCall: true });
     });
   
     const {remotePeerId} = get();
@@ -125,12 +120,10 @@ export const useVideoStore = create((set, get) => ({
   },
 
   disconnectCall: (receiver) => {
-    const { roomId, peer, localStream } = get();
+    const { peer, localStream } = get();
     const socket = useAuthStore.getState().socket;
   
-    if (!roomId) return;
-  
-    socket.emit('leave-vc-room', roomId, receiver);
+    socket.emit('leave-vc-room', receiver);
     
     if (localStream) {
       localStream.getTracks().forEach((track) => track.stop());
@@ -141,7 +134,6 @@ export const useVideoStore = create((set, get) => ({
     }
   
     set({
-      roomId: null,
       isInCall: false,
       remotePeerId: null,
       localStream: null,
@@ -168,7 +160,6 @@ export const useVideoStore = create((set, get) => ({
       }
   
       set({
-        roomId: null,
         isInCall: false,
         remotePeerId: null,
         localStream: null,

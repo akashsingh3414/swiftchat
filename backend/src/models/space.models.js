@@ -28,11 +28,7 @@ const spaceSchema = new mongoose.Schema({
                 type: String,
                 required: true
             }
-        }],
-        // default: [{
-        //     title: "Default Video",
-        //     url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
-        // }]
+        }]
     },
     acceptingInvites: {
         type: Boolean,

@@ -20,7 +20,7 @@ const VideoCall = () => {
   const navigate = useNavigate()
   const { selectedUser } = useChatStore();
   const { authUser } = useAuthStore();
-  const {myPeerId, remotePeerId, roomId} = useVideoStore();
+  const {myPeerId, remotePeerId} = useVideoStore();
 
   const localVideoRef = useRef(null);
   const remoteVideoRef = useRef(null);
@@ -35,11 +35,10 @@ const VideoCall = () => {
   }
 
   useEffect(()=>{
-    console.log(roomId, myPeerId, isInCall)
-    if(!roomId || !myPeerId || !isInCall) {
+    if(!myPeerId || !isInCall) {
       navigate('/')
     }
-  },[roomId, myPeerId, isInCall])
+  },[myPeerId, isInCall])
 
   useEffect(() => {
     if (localVideoRef.current && localStream) {
@@ -54,7 +53,7 @@ const VideoCall = () => {
   useEffect(()=>{
     listenForNewRoom()
     listenForUserJoined()
-  },[myPeerId, remotePeerId, roomId, isInCall])
+  },[myPeerId, remotePeerId, isInCall])
 
   return (
     <div className="flex flex-col items-center p-4 mt-16 w-full max-w-5xl mx-auto">
