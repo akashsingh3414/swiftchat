@@ -56,11 +56,10 @@ const ChatHeader = () => {
             <img src={image || "/avatar.png"} alt={name} />
           </div>
         </div>
-        <div className="hidden sm:block">
-          <h3 className="text-sm font-semibold">{name}</h3>
+        <div>
+          <h3 className="text-sm font-semibold truncate">{name}</h3>
           <p className="text-xs text-gray-500">{status}</p>
         </div>
-        <div className="sm:hidden"><h3>{name.slice(0,10)}...</h3></div>
       </div>
 
       <div className="flex items-center gap-2 relative">

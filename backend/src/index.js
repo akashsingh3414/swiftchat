@@ -9,6 +9,7 @@ import { app, server } from './lib/socket.js'
 import userRouter from './routes/user.routes.js'
 import spaceRouter from './routes/space.routes.js'
 import { ExpressPeerServer } from 'peer'
+import syncWatchRouter from './routes/syncwatch.routes.js'
 
 dotenv.config()
 
@@ -30,6 +31,7 @@ app.use('/api/auth', authRouter)
 app.use('/api/message', messageRouter)
 app.use('/api/user', userRouter)
 app.use('/api/space', spaceRouter)
+app.use('/api/sync-watch', syncWatchRouter)
 app.use('/peerjs', peerServer);
 
 const PORT = process.env.PORT || 5001

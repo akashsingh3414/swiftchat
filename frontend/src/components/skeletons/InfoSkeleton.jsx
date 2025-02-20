@@ -1,19 +1,19 @@
 import { Trash2, VideoIcon, Youtube } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useChatStore } from "../../store/useChatStore";
 import { useSpaceStore } from "../../store/useSpaceStore";
 import { useAuthStore } from "../../store/useAuthStore";
-import { useNavigate } from 'react-router-dom';
 import { useVideoStore } from "../../store/useVideoStore";
+import { toast } from "sonner";
 
 const InfoSkeleton = () => {
-  const { getUsers, selectedUser, removeConnection } = useChatStore();
-  const { getSpaces, selectedSpace, spaceMembers, getMembersForSpace, leaveSpace, deleteSpace, toggleJoining, removeUserFromSpace } = useSpaceStore();
+  const { getUsers, selectedUser, removeConnection, addUserWatchHistory } = useChatStore();
+  const { getSpaces, selectedSpace, spaceMembers, getMembersForSpace, leaveSpace, deleteSpace, toggleJoining, removeUserFromSpace, addSpaceWatchHistory } = useSpaceStore();
   const { onlineUsers, authUser } = useAuthStore();
   const { joinRoom, createRoom, initPeer, remotePeerId, isInCall, listenForUserJoined, listenForNewRoom, myPeerId } = useVideoStore();
-
   const [acceptInvite, setAcceptInvite] = useState(selectedSpace?.acceptingInvites);
-  const navigate = useNavigate();
+  const [startSync, setStartSync] = useState(false);
+  const ytUrl = useRef(null)
 
   const handleRemoveUser = () => removeConnection(selectedUser.connectionCode);
 
@@ -41,15 +41,29 @@ const InfoSkeleton = () => {
   
       if (!remotePeerId) {
         await createRoom(selectedUser);
-        navigate('/vc')
       } else {
         joinRoom(selectedUser);
-        navigate('/vc')
       }
     } catch (error) {
       console.error("Video call initiation failed:", error);
     }
   };
+
+  const handleStart = () => {
+    setStartSync(prev=>!prev)
+
+    if(!ytUrl) {
+      toast.error('Please provide Youtube Url')
+      return
+    }
+
+    if(selectedSpace && ytUrl) {
+      addSpaceWatchHistory(selectedSpace._id, ytUrl.current.value)
+    } else if(selectedUser && ytUrl) {
+      addUserWatchHistory(selectedUser._id, ytUrl.current.value)
+    }
+    return
+  }
 
   const handleLeaveSpace = () => leaveSpace(selectedSpace.spaceCode);
   const handleDeleteSpaces = () => deleteSpace(selectedSpace._id);
@@ -82,12 +96,24 @@ const InfoSkeleton = () => {
           {selectedUser?.about && <p className="text-sm text-center text-base-content/80">{selectedUser.about}</p>}
 
           <div className="flex flex-col w-full gap-4 mt-4">
+
             <button onClick={handleVideoCall} className={`btn btn-primary btn-sm gap-2 ${isInCall || myPeerId ? "btn-success" : ""}`}>
-              <VideoIcon className="w-4 h-4" /> Video Call
+              <VideoIcon className="w-4 h-4" /> Video Chat
             </button>
-            <button className="btn btn-outline btn-sm text-red-500 border-red-500 hover:bg-red-500 hover:text-white flex items-center gap-2">
+
+            {!startSync && <button onClick={()=>(
+              setStartSync(prev=>!prev)
+            )} className="btn btn-outline btn-sm text-red-500 border-red-500 hover:bg-red-500 hover:text-white flex items-center">
               <Youtube /> Sync Watch
-            </button>
+            </button>}
+
+            {startSync && <div className="w-full">
+                <form action="" type="submit" className="flex flex-1 items-center justify-center gap-2 w-full">
+                  <input type="text" placeholder="Type or paste URL" ref={ytUrl} className="px-4 py-1 w-full rounded outline-none"/>
+                  <button onClick={handleStart} className="btn btn-outline btn-sm rounded px-1 py-1">Start</button>
+                </form>
+              </div>}
+              
             <button onClick={handleRemoveUser} className="btn btn-error btn-sm mt-4">Remove Connection</button>
           </div>
         </div>
@@ -109,9 +135,18 @@ const InfoSkeleton = () => {
               <input type="checkbox" checked={acceptInvite} onChange={handleToggleInvite} className="toggle toggle-success rounded-full" />
             </div>
 
-            <button className="btn btn-outline btn-sm w-full text-red-500 border-red-500 hover:bg-red-500 hover:text-white flex items-center gap-2">
+            {!startSync && <button onClick={()=>(
+              setStartSync(prev=>!prev)
+            )} className="btn btn-outline btn-sm text-red-500 border-red-500 hover:bg-red-500 hover:text-white flex items-center">
               <Youtube /> Sync Watch
-            </button>
+            </button>}
+
+            {startSync && <div className="w-full">
+                <form action="" type="submit" className="flex flex-1 items-center justify-center gap-2 w-full">
+                  <input type="text" placeholder="Type or paste URL" ref={ytUrl} className="px-4 py-1 w-full rounded outline-none"/>
+                  <button onClick={handleStart} className="btn btn-outline btn-sm rounded px-1 py-1">Start</button>
+                </form>
+              </div>}
 
             <div className="flex justify-center gap-2">
               <button onClick={handleLeaveSpace} className="btn btn-secondary btn-sm flex-grow">Leave Space</button>
@@ -145,7 +180,7 @@ const InfoSkeleton = () => {
                     <button onClick={() => handleUserRemovalFromSpace(member._id)} className="btn btn-sm btn-secondary btn-outline text-xs px-2">Remove</button>
                   )}
                   {member._id === selectedSpace.creator && <span className="text-xs text-base-content/60">Admin</span>}
-                  {member._id === authUser._id && member._id !== selectedSpace.creator && <span className="text-xs text-base-content/60">You</span>}
+                  {member._id === authUser._id && <span className="text-xs text-base-content/60">(You)</span>}
                 </div>
               ))
             ) : (

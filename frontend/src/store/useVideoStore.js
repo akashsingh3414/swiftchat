@@ -1,7 +1,6 @@
 import { create } from 'zustand';
 import { useAuthStore } from './useAuthStore';
 import { toast } from 'sonner';
-import { v4 as uuid } from 'uuid';
 import Peer from 'peerjs';
 
 export const useVideoStore = create((set, get) => ({
@@ -47,6 +46,7 @@ export const useVideoStore = create((set, get) => ({
     }
   
     const socket = useAuthStore.getState().socket;
+    const { authUser } = useAuthStore.getState().authUser;
     if (!socket) {
       console.error('Socket not found. Ensure you are connected.');
       toast.error('Socket connection issue.');

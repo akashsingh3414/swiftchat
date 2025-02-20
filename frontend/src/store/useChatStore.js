@@ -58,9 +58,31 @@ export const useChatStore = create((set, get) => ({
 
   getUserWatchHistory: async (userId) => {
     try {
-      const res = await axiosInstance.post('/user/watch-history', {userId})
+      const res = await axiosInstance.post('/sync-watch/get', {userId})
       set({
         userWatchHistory: res.data.watchHistory
+      })
+    } catch (error) {
+      toast.error(error.response?.data?.message || error.message);
+    }
+  },
+
+  addUserWatchHistory: async (userId, ytUrl) => {
+    try {
+      const res = await axiosInstance.post('/sync-watch/add', {userId, ytUrl})
+      set({
+        userWatchHistory: res.data.watchHistory
+      })
+    } catch (error) {
+      toast.error(error.response?.data?.message || error.message);
+    }
+  },
+
+  deleteUserWatchHistory: async (userId, ytUrl) => {
+    try {
+      await axiosInstance.delete('/sync-watch/delete', {data: {userId, ytUrl}})
+      set({
+        userWatchHistory: get().userWatchHistory.filter(history => history.url != ytUrl)
       })
     } catch (error) {
       toast.error(error.response?.data?.message || error.message);

@@ -60,14 +60,8 @@ const Sidebar = () => {
               </div>
 
               {isExpanded && (
-                <span className="text-base-900 font-semibold text-lg px-2">
-                  {isSpace
-                    ? item?.name.length > 10
-                      ? item?.name.slice(0, 10) + "..."
-                      : item?.name
-                    : item?.fullName.length > 10
-                    ? item?.fullName.slice(0, 10) + "..."
-                    : item?.fullName}
+                <span className="text-base-900 font-semibold text-lg px-2 truncate max-w-[100px]">
+                  {isSpace ? item?.name : item?.fullName}
                 </span>
               )}
             </button>

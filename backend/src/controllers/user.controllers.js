@@ -1,4 +1,3 @@
-
 import fs from 'fs'
 import User from '../models/user.models.js';
 import Message from '../models/message.models.js';
@@ -161,18 +160,3 @@ export const deleteProfile = async (req, res) => {
         return res.status(500).json({ message: 'Internal server error' });
     }
 };
-
-export const userWatchHistory = async (req, res) => {
-    const userId = req.body.userId
-
-    try {
-        const user = await User.findById(userId)
-        if(!user) {
-            return res.status(404).json({message: "User not found. Invalid User Id"})
-        }
-        return res.status(200).json({watchHistory: user.watchHistory})
-    } catch (error) {
-        console.log('Error in userWatchHistory controller', error)
-        return res.status(500).json({ message: "Internal Server Error" });
-    }
-}

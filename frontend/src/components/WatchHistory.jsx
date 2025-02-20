@@ -1,12 +1,20 @@
 import React, { useEffect } from 'react'
 import { useSpaceStore } from '../store/useSpaceStore.js'
 import { useChatStore } from '../store/useChatStore.js'
+import { Trash2, Youtube } from 'lucide-react'
 
 const WatchHistory = () => {
-  const {spaceWatchHistory, selectedSpace, getSpaceWatchHistory} = useSpaceStore()
-  const {userWatchHistory, selectedUser, getUserWatchHistory} = useChatStore()
+  const {spaceWatchHistory, selectedSpace, getSpaceWatchHistory, deleteSpaceWatchHistory} = useSpaceStore()
+  const {userWatchHistory, selectedUser, getUserWatchHistory, deleteUserWatchHistory} = useChatStore()
 
-  const watchHistory = [...spaceWatchHistory, ...userWatchHistory]
+  const handleDeleteYturl = (ytUrl) => {
+    if(selectedSpace && ytUrl) {
+      deleteSpaceWatchHistory(selectedSpace._id, ytUrl)
+    } else if(selectedUser && ytUrl) {
+      deleteUserWatchHistory(selectedUser._id, ytUrl)
+    }
+    return
+  }
 
   useEffect(()=>{
     if(selectedSpace) {
@@ -17,14 +25,24 @@ const WatchHistory = () => {
   },[selectedSpace, selectedUser])
 
   return (
-    <div className='p-1 border-l w-full max-w-[15rem] border-base-200 bg-base-200/90 hidden lg:block flex flex-col'>
-      <div className='border-b border-base-600 py-2 font-semibold px-4'>Watch History</div>
-      <div>
-        {watchHistory.length === 0 ? <span className='px-4'>Nothing to show here</span> : <div>
-          {watchHistory.map((history, index)=>(
-            <button key={index} className='px-4 py-2 gap-1 border-b w-full flex justify-begin'>{index}. {history.title}</button>
-          ))}
-        </div>}
+    <div className='w-full max-w-[15rem] hidden lg:block flex flex-col overflow-x-hidden overflow-y-auto'>
+      <div className='py-2.5 px-4 font-semibold px-4 border-base-300 bg-base-200 border-b text-sm relative'><Youtube className='inline mx-2 text-red-500'/>Recent YouTube Views</div>
+        <div>
+          {(selectedSpace && spaceWatchHistory.length === 0 ) || (selectedUser && userWatchHistory.length === 0) ?  <span className='px-4 py-2 flex item-center justify-begin text-gray-500 italic'>No history yet. Sync to start!</span> : <div>
+            {selectedSpace && spaceWatchHistory.map((history, index)=>(
+              <div className='flex px-4 py-1 w-full rounded items-center justify-between hover:bg-base-300' key={index}>
+                <button className='hover:text-primary truncate'>{index+1}. {history.title}</button>
+                <button onClick={() => (handleDeleteYturl(history.url))} className='btn btn-sm hover:text-red-500'><Trash2 /></button>
+              </div>
+            ))}
+
+            {selectedUser && userWatchHistory.map((history, index)=>(
+              <div className='flex px-4 py-1 w-full rounded items-center justify-between hover:bg-base-300' key={index}>
+                <button className='hover:text-primary truncate'>{index+1}. {history.title}</button>
+                <button onClick={() => (handleDeleteYturl(history.url))} className='btn btn-sm hover:text-red-500'><Trash2 /></button>
+              </div>
+            ))}
+          </div>}
       </div>
     </div>
   )

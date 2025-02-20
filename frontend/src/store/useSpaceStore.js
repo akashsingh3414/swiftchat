@@ -124,9 +124,31 @@ export const useSpaceStore = create((set, get) => ({
 
   getSpaceWatchHistory: async (spaceId) => {
     try {
-      const res = await axiosInstance.post('/space/watch-history', {spaceId})
+      const res = await axiosInstance.post('/sync-watch/get', {spaceId})
       set({
         spaceWatchHistory: res.data.watchHistory
+      })
+    } catch (error) {
+      toast.error(error.response?.data?.message || error.message);
+    }
+  },
+
+  addSpaceWatchHistory: async (spaceId, ytUrl) => {
+    try {
+      const res = await axiosInstance.post('/sync-watch/add', {spaceId, ytUrl})
+      set({
+        spaceWatchHistory: res.data.watchHistory
+      })
+    } catch (error) {
+      toast.error(error.response?.data?.message || error.message);
+    }
+  },
+
+  deleteSpaceWatchHistory: async (spaceId, ytUrl) => {
+    try {
+      await axiosInstance.delete('/sync-watch/delete', {data: {spaceId, ytUrl}})
+      set({
+        spaceWatchHistory: get().spaceWatchHistory.filter(history => history.url != ytUrl)
       })
     } catch (error) {
       toast.error(error.response?.data?.message || error.message);

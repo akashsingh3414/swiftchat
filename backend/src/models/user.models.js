@@ -28,9 +28,18 @@ const userSchema = new mongoose.Schema({
         type: String,
         default: ''
     },
-    watchHistory: [{
-        type: String,
-    }],
+    watchHistory: {
+        type: [{
+            title: {
+                type: String,
+                required: true
+            },
+            url: {
+                type: String,
+                required: true
+            }
+        }]
+    },
     about: {
         type: String,
         default: ''
