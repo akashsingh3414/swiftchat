@@ -78,11 +78,11 @@ export const useChatStore = create((set, get) => ({
     }
   },
 
-  deleteUserWatchHistory: async (userId, ytUrl) => {
+  deleteUserWatchHistory: async (userId, ytUrlId) => {
     try {
-      await axiosInstance.delete('/sync-watch/delete', {data: {userId, ytUrl}})
+      await axiosInstance.delete('/sync-watch/delete', {data: {userId, ytUrlId}})
       set({
-        userWatchHistory: get().userWatchHistory.filter(history => history.url != ytUrl)
+        userWatchHistory: get().userWatchHistory.filter(history => history._id != ytUrlId)
       })
     } catch (error) {
       toast.error(error.response?.data?.message || error.message);

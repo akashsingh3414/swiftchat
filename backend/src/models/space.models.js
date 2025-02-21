@@ -20,6 +20,11 @@ const spaceSchema = new mongoose.Schema({
     },
     watchHistory: {
         type: [{
+            host: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'User',
+                required: true,
+            },
             title: {
                 type: String,
                 required: true

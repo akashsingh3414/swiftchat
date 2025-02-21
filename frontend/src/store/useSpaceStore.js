@@ -144,11 +144,11 @@ export const useSpaceStore = create((set, get) => ({
     }
   },
 
-  deleteSpaceWatchHistory: async (spaceId, ytUrl) => {
+  deleteSpaceWatchHistory: async (spaceId, ytUrlId) => {
     try {
-      await axiosInstance.delete('/sync-watch/delete', {data: {spaceId, ytUrl}})
+      await axiosInstance.delete('/sync-watch/delete', {data: {spaceId, ytUrlId}})
       set({
-        spaceWatchHistory: get().spaceWatchHistory.filter(history => history.url != ytUrl)
+        spaceWatchHistory: get().spaceWatchHistory.filter(history => history._id != ytUrlId)
       })
     } catch (error) {
       toast.error(error.response?.data?.message || error.message);

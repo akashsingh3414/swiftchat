@@ -2,16 +2,18 @@ import React, { useEffect } from 'react'
 import { useSpaceStore } from '../store/useSpaceStore.js'
 import { useChatStore } from '../store/useChatStore.js'
 import { Trash2, Youtube } from 'lucide-react'
+import { useAuthStore } from '../store/useAuthStore.js'
 
 const WatchHistory = () => {
   const {spaceWatchHistory, selectedSpace, getSpaceWatchHistory, deleteSpaceWatchHistory} = useSpaceStore()
   const {userWatchHistory, selectedUser, getUserWatchHistory, deleteUserWatchHistory} = useChatStore()
+  const {authUser} = useAuthStore()
 
-  const handleDeleteYturl = (ytUrl) => {
-    if(selectedSpace && ytUrl) {
-      deleteSpaceWatchHistory(selectedSpace._id, ytUrl)
-    } else if(selectedUser && ytUrl) {
-      deleteUserWatchHistory(selectedUser._id, ytUrl)
+  const handleDeleteYturl = (ytUrlId) => {
+    if(selectedSpace && ytUrlId) {
+      deleteSpaceWatchHistory(selectedSpace._id, ytUrlId)
+    } else if(selectedUser && ytUrlId) {
+      deleteUserWatchHistory(authUser._id, ytUrlId)
     }
     return
   }
@@ -32,14 +34,14 @@ const WatchHistory = () => {
             {selectedSpace && spaceWatchHistory.map((history, index)=>(
               <div className='flex px-4 py-1 w-full rounded items-center justify-between hover:bg-base-300' key={index}>
                 <button className='hover:text-primary truncate'>{index+1}. {history.title}</button>
-                <button onClick={() => (handleDeleteYturl(history.url))} className='btn btn-sm hover:text-red-500'><Trash2 /></button>
+                {selectedSpace.creator === authUser._id && <button onClick={() => (handleDeleteYturl(history._id))} className='btn btn-sm hover:text-red-500'><Trash2 /></button>}
               </div>
             ))}
 
             {selectedUser && userWatchHistory.map((history, index)=>(
               <div className='flex px-4 py-1 w-full rounded items-center justify-between hover:bg-base-300' key={index}>
                 <button className='hover:text-primary truncate'>{index+1}. {history.title}</button>
-                <button onClick={() => (handleDeleteYturl(history.url))} className='btn btn-sm hover:text-red-500'><Trash2 /></button>
+                <button onClick={() => (handleDeleteYturl(history._id))} className='btn btn-sm hover:text-red-500'><Trash2 /></button>
               </div>
             ))}
           </div>}

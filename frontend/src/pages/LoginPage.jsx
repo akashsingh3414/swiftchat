@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { useAuthStore } from "../store/useAuthStore";
+import { useChatStore } from "../store/useChatStore";
+import { useSpaceStore } from "../store/useSpaceStore";
 import AuthImagePattern from "../components/AuthImagePattern";
 import { Link } from "react-router-dom";
 import { Eye, EyeOff, Loader2, Lock, Mail, MessageSquare } from "lucide-react";
@@ -11,9 +13,13 @@ const LoginPage = () => {
     password: "",
   });
   const { login, isLoggingIn } = useAuthStore();
+  const {setSelectedSpace} = useSpaceStore()
+  const {setSelectedUser} = useChatStore()
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setSelectedSpace(null)
+    setSelectedUser(null);
     login(formData);
   };
 
