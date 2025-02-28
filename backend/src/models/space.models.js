@@ -18,23 +18,6 @@ const spaceSchema = new mongoose.Schema({
         required: true,
         unique: true,
     },
-    watchHistory: {
-        type: [{
-            host: {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: 'User',
-                required: true,
-            },
-            title: {
-                type: String,
-                required: true
-            },
-            url: {
-                type: String,
-                required: true
-            }
-        }]
-    },
     acceptingInvites: {
         type: Boolean,
         required: true,

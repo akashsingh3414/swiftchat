@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuthStore } from "../store/useAuthStore";
 import { LogOut, MessageSquare, Settings, User } from "lucide-react";
 import { useSpaceStore } from "../store/useSpaceStore";
@@ -8,10 +8,12 @@ const Navbar = () => {
   const { logout, authUser } = useAuthStore();
   const {setSelectedSpace} = useSpaceStore()
   const {setSelectedUser} = useChatStore()
+  const navigate = useNavigate()
 
   const handleClick = () => {
     setSelectedSpace(null)
     setSelectedUser(null)
+    navigate('/')
   }
 
   return (

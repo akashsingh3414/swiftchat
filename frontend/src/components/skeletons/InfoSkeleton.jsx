@@ -1,19 +1,21 @@
 import { Trash2, VideoIcon, Youtube } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useChatStore } from "../../store/useChatStore";
 import { useSpaceStore } from "../../store/useSpaceStore";
 import { useAuthStore } from "../../store/useAuthStore";
 import { useVideoStore } from "../../store/useVideoStore";
+import { useSpaceStreamStore } from "../../store/useSpaceStreamStore";
 import { toast } from "sonner";
 
 const InfoSkeleton = () => {
-  const { getUsers, selectedUser, removeConnection, addUserWatchHistory } = useChatStore();
-  const { getSpaces, selectedSpace, spaceMembers, getMembersForSpace, leaveSpace, deleteSpace, toggleJoining, removeUserFromSpace, addSpaceWatchHistory } = useSpaceStore();
+  const { getUsers, selectedUser, removeConnection } = useChatStore();
+  const { getSpaces, selectedSpace, spaceMembers, getMembersForSpace, leaveSpace, deleteSpace, toggleJoining, removeUserFromSpace } = useSpaceStore();
   const { onlineUsers, authUser } = useAuthStore();
   const { joinRoom, createRoom, initPeer, remotePeerId, isInCall, listenForUserJoined, listenForNewRoom, myPeerId } = useVideoStore();
+  const { inVideoStream, startStream } = useSpaceStreamStore();
   const [acceptInvite, setAcceptInvite] = useState(selectedSpace?.acceptingInvites);
   const [startSync, setStartSync] = useState(false);
-  const ytUrl = useRef(null)
+  const [uploadedVideo, setUploadedVideo] = useState(null);
 
   const handleRemoveUser = () => removeConnection(selectedUser.connectionCode);
 
@@ -33,7 +35,19 @@ const InfoSkeleton = () => {
     }
   }, [selectedSpace]);
 
+  useEffect(() => {
+    setStartSync(false);
+    setUploadedVideo(null);
+  }, [selectedUser, selectedSpace]);  
+
   const handleVideoCall = async () => {
+    if(inVideoStream) {
+      setUploadedVideo(null);
+      setStartSync(false);
+      toast.error('Already streaming video. Leave or stop streaming.');
+      return;
+    }
+
     try {
       listenForUserJoined()
       listenForNewRoom()
@@ -50,19 +64,16 @@ const InfoSkeleton = () => {
   };
 
   const handleStart = () => {
-    setStartSync(prev=>!prev)
-
-    if(!ytUrl) {
-      toast.error('Please provide Youtube Url')
-      return
+    if(isInCall) {
+      setUploadedVideo(null);
+      setStartSync(false);
+      toast.error('Already on call. Disconnect the call first');
+      return;
     }
 
-    if(selectedSpace && ytUrl) {
-      addSpaceWatchHistory(selectedSpace._id, ytUrl.current.value)
-    } else if(selectedUser && ytUrl) {
-      addUserWatchHistory(selectedUser._id, ytUrl.current.value)
-    }
-    return
+    setUploadedVideo(null);
+    setStartSync(false);
+    startStream();
   }
 
   const handleLeaveSpace = () => leaveSpace(selectedSpace.spaceCode);
@@ -101,19 +112,37 @@ const InfoSkeleton = () => {
               <VideoIcon className="w-4 h-4" /> Video Chat
             </button>
 
-            {!startSync && <button onClick={()=>(
-              setStartSync(prev=>!prev)
-            )} className="btn btn-outline btn-sm text-red-500 border-red-500 hover:bg-red-500 hover:text-white flex items-center">
-              <Youtube /> Sync Watch
-            </button>}
+            {!startSync && (
+              <button
+                onClick={() => setStartSync(true)}
+                disabled={true}
+                className="btn btn-outline btn-sm text-red-500 border-red-500 hover:bg-red-500 hover:text-white flex items-center"
+              >
+                <Youtube /> Upload Video
+              </button>
+            )}
 
-            {startSync && <div className="w-full">
-                <form action="" type="submit" className="flex flex-1 items-center justify-center gap-2 w-full">
-                  <input type="text" placeholder="Type or paste URL" ref={ytUrl} className="px-4 py-1 w-full rounded outline-none"/>
-                  <button onClick={handleStart} className="btn btn-outline btn-sm rounded px-1 py-1">Start</button>
+            {startSync && (
+              <div className="w-full">
+                <form className="flex flex-1 flex-col items-center justify-center gap-2 w-full">
+                  {!uploadedVideo && <input
+                    type="file"
+                    accept="video/*"
+                    onChange={(e) => setUploadedVideo(e.target.files[0])}
+                    className="px-4 py-1 w-full rounded outline-none border"
+                  />}
+
+                  {uploadedVideo && (
+                    <div className="flex w-full gap-2">
+                      <button onClick={handleStart} className="btn btn-outline btn-sm w-full rounded px-1 py-1">
+                        Start Stream
+                      </button>
+                    </div>
+                  )}
                 </form>
-              </div>}
-              
+              </div>
+            )}   
+
             <button onClick={handleRemoveUser} className="btn btn-error btn-sm mt-4">Remove Connection</button>
           </div>
         </div>
@@ -135,18 +164,35 @@ const InfoSkeleton = () => {
               <input type="checkbox" checked={acceptInvite} onChange={handleToggleInvite} className="toggle toggle-success rounded-full" />
             </div>
 
-            {!startSync && <button onClick={()=>(
-              setStartSync(prev=>!prev)
-            )} className="btn btn-outline btn-sm text-red-500 border-red-500 hover:bg-red-500 hover:text-white flex items-center">
-              <Youtube /> Sync Watch
-            </button>}
+            {!startSync && (
+              <button
+                onClick={() => setStartSync(true)}
+                className="btn btn-outline btn-sm text-red-500 border-red-500 hover:bg-red-500 hover:text-white flex items-center"
+              >
+                <Youtube /> Upload Video
+              </button>
+            )}
 
-            {startSync && <div className="w-full">
-                <form action="" type="submit" className="flex flex-1 items-center justify-center gap-2 w-full">
-                  <input type="text" placeholder="Type or paste URL" ref={ytUrl} className="px-4 py-1 w-full rounded outline-none"/>
-                  <button onClick={handleStart} className="btn btn-outline btn-sm rounded px-1 py-1">Start</button>
+            {startSync && (
+              <div className="w-full">
+                <form className="flex flex-1 flex-col items-center justify-center gap-2 w-full">
+                  {!uploadedVideo && <input
+                    type="file"
+                    accept="video/*"
+                    onChange={(e) => setUploadedVideo(e.target.files[0])}
+                    className="px-4 py-1 w-full rounded outline-none border"
+                  />}
+
+                  {uploadedVideo && (
+                    <div className="flex w-full gap-2">
+                      <button onClick={handleStart} className="btn btn-outline btn-sm rounded w-full px-1 py-1">
+                        Start Stream
+                      </button>
+                    </div>
+                  )}
                 </form>
-              </div>}
+              </div>
+            )}
 
             <div className="flex justify-center gap-2">
               <button onClick={handleLeaveSpace} className="btn btn-secondary btn-sm flex-grow">Leave Space</button>

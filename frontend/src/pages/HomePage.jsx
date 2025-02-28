@@ -4,14 +4,17 @@ import NoChatSelected from "../components/NoChatSelected";
 import ChatContainer from "../components/ChatContainer";
 import { useSpaceStore } from "../store/useSpaceStore";
 import InfoSkeleton from "../components/skeletons/InfoSkeleton";
-import WatchHistory from "../components/WatchHistory";
+import LiveStreams from "../components/LiveStreams";
 import VideoCall from "../components/VideoCall";
 import { useVideoStore } from "../store/useVideoStore";
+import VideoStream from '../components/VideoStream'
+import { useSpaceStreamStore } from "../store/useSpaceStreamStore";
 
 const HomePage = () => {
   const { selectedUser } = useChatStore();
   const { selectedSpace } = useSpaceStore();
   const {isInCall, myPeerId} = useVideoStore();
+  const {inVideoStream} = useSpaceStreamStore();
 
   return (
     <div className="h-screen bg-base-200">
@@ -22,7 +25,10 @@ const HomePage = () => {
             <InfoSkeleton />
             {!selectedUser && !selectedSpace ? <NoChatSelected /> : (!isInCall || !myPeerId) ? <>
               <ChatContainer />
-              <WatchHistory />
+              {inVideoStream && <VideoStream />}
+              {selectedSpace && <>
+                <LiveStreams />
+              </>}              
             </> : <>
               <ChatContainer />
               <div className="w-full lg:max-w-[30%]">

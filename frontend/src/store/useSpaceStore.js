@@ -7,7 +7,6 @@ export const useSpaceStore = create((set, get) => ({
   spaces: [],
   selectedSpace: null,
   messages: [],
-  spaceWatchHistory: [],
   spaceMembers: [],
   isSpacesLoading: false,
   isMessagesLoading: false,
@@ -117,39 +116,6 @@ export const useSpaceStore = create((set, get) => ({
       set({
         spaceMembers: res.data.members
       });
-    } catch (error) {
-      toast.error(error.response?.data?.message || error.message);
-    }
-  },
-
-  getSpaceWatchHistory: async (spaceId) => {
-    try {
-      const res = await axiosInstance.post('/sync-watch/get', {spaceId})
-      set({
-        spaceWatchHistory: res.data.watchHistory
-      })
-    } catch (error) {
-      toast.error(error.response?.data?.message || error.message);
-    }
-  },
-
-  addSpaceWatchHistory: async (spaceId, ytUrl) => {
-    try {
-      const res = await axiosInstance.post('/sync-watch/add', {spaceId, ytUrl})
-      set({
-        spaceWatchHistory: res.data.watchHistory
-      })
-    } catch (error) {
-      toast.error(error.response?.data?.message || error.message);
-    }
-  },
-
-  deleteSpaceWatchHistory: async (spaceId, ytUrlId) => {
-    try {
-      await axiosInstance.delete('/sync-watch/delete', {data: {spaceId, ytUrlId}})
-      set({
-        spaceWatchHistory: get().spaceWatchHistory.filter(history => history._id != ytUrlId)
-      })
     } catch (error) {
       toast.error(error.response?.data?.message || error.message);
     }

@@ -28,28 +28,6 @@ const userSchema = new mongoose.Schema({
         type: String,
         default: ''
     },
-    watchHistory: {
-        type: [{
-            host: {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: 'User',
-                required: true,
-            },
-            viewer: {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: 'User',
-                required: true,
-            },
-            title: {
-                type: String,
-                required: true
-            },
-            url: {
-                type: String,
-                required: true
-            }
-        }]
-    },
     about: {
         type: String,
         default: ''

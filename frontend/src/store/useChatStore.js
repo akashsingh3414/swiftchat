@@ -6,7 +6,6 @@ import { useAuthStore } from "./useAuthStore";
 export const useChatStore = create((set, get) => ({
   messages: [],
   users: [],
-  userWatchHistory: [],
   selectedUser: null,
   isUsersLoading: false,
   isMessagesLoading: false,
@@ -51,39 +50,6 @@ export const useChatStore = create((set, get) => ({
 
       set({ messages: [...messages, newMessage] });
 
-    } catch (error) {
-      toast.error(error.response?.data?.message || error.message);
-    }
-  },
-
-  getUserWatchHistory: async (userId) => {
-    try {
-      const res = await axiosInstance.post('/sync-watch/get', {userId})
-      set({
-        userWatchHistory: res.data.watchHistory
-      })
-    } catch (error) {
-      toast.error(error.response?.data?.message || error.message);
-    }
-  },
-
-  addUserWatchHistory: async (userId, ytUrl) => {
-    try {
-      const res = await axiosInstance.post('/sync-watch/add', {userId, ytUrl})
-      set({
-        userWatchHistory: res.data.watchHistory
-      })
-    } catch (error) {
-      toast.error(error.response?.data?.message || error.message);
-    }
-  },
-
-  deleteUserWatchHistory: async (userId, ytUrlId) => {
-    try {
-      await axiosInstance.delete('/sync-watch/delete', {data: {userId, ytUrlId}})
-      set({
-        userWatchHistory: get().userWatchHistory.filter(history => history._id != ytUrlId)
-      })
     } catch (error) {
       toast.error(error.response?.data?.message || error.message);
     }
