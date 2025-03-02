@@ -47,9 +47,6 @@ const ChatHeader = () => {
         setIsDropdownOpen(false);
       }
     }, [allStreams, selectedSpace]);
-    
-    console.log(allStreams)
-    console.log(hostId)
 
   const handleDeleteAllMessages = () => {
     if (selectedSpace) deleteAllSpaceMessages(selectedSpace._id);

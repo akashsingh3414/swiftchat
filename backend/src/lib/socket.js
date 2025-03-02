@@ -60,6 +60,19 @@ io.on('connection', (socket) => {
     console.log(`User ${socket.id} joined space ${spaceId}`);
   });
 
+  socket.on('join-stream', ({userId, streamUrl, spaceId}) => {
+    console.log(`${userId} joining the stream of space ${spaceId}`)
+    io.to(spaceId.toString()).emit('joined-stream', { userId, streamUrl, spaceId });
+  });
+
+  socket.on('leave-stream', ({userId, streamUrl, spaceId, numOfusers}) => {
+    console.log(`${userId} leaving the stream of space ${spaceId}`)
+    if(numOfusers===1) {
+      io.to(spaceId).emit('stream-ended', {spaceId});
+    } else 
+    io.to(spaceId.toString()).emit('left-stream', { userId, streamUrl, spaceId });
+  });
+
   socket.on('disconnect', () => {
     console.log('User disconnected:', socket.id);
     if (socket.data.userId) delete userSocketMap[socket.data.userId];

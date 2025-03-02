@@ -1,4 +1,4 @@
-import { Trash2, VideoIcon, Youtube } from "lucide-react";
+import { Loader, LoaderCircle, LoaderPinwheel, Trash2, VideoIcon, Youtube } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useChatStore } from "../../store/useChatStore";
 import { useSpaceStore } from "../../store/useSpaceStore";
@@ -12,10 +12,11 @@ const InfoSkeleton = () => {
   const { getSpaces, selectedSpace, spaceMembers, getMembersForSpace, leaveSpace, deleteSpace, toggleJoining, removeUserFromSpace } = useSpaceStore();
   const { onlineUsers, authUser } = useAuthStore();
   const { joinRoom, createRoom, initPeer, remotePeerId, isInCall, listenForUserJoined, listenForNewRoom, myPeerId } = useVideoStore();
-  const { inVideoStream, startStream } = useSpaceStreamStore();
+  const { inVideoStream, startStream, currentStreamUrl } = useSpaceStreamStore();
   const [acceptInvite, setAcceptInvite] = useState(selectedSpace?.acceptingInvites);
   const [startSync, setStartSync] = useState(false);
   const [uploadedVideo, setUploadedVideo] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const handleRemoveUser = () => removeConnection(selectedUser.connectionCode);
 
@@ -27,6 +28,14 @@ const InfoSkeleton = () => {
     getUsers();
     getSpaces();
   }, []);
+
+  useEffect(()=>{
+    if(uploadedVideo && !currentStreamUrl) {
+      setLoading(true);
+    } else if(!uploadedVideo && currentStreamUrl) {
+      setLoading(false);
+    }
+  }, [inVideoStream, currentStreamUrl])
 
   useEffect(() => {
     if (selectedSpace) {
@@ -67,12 +76,14 @@ const InfoSkeleton = () => {
     if(isInCall) {
       setUploadedVideo(null);
       setStartSync(false);
+      setLoading(false);
       toast.error('Already on call. Disconnect the call first');
       return;
     }
 
     setUploadedVideo(null);
     setStartSync(false);
+    setLoading(true);
     startStream(authUser._id, uploadedVideo, selectedSpace._id);
   }
 
@@ -113,13 +124,21 @@ const InfoSkeleton = () => {
             </button>
 
             {!startSync && (
-              <button
-                onClick={() => setStartSync(true)}
-                disabled={true} //or chat has a video stream
-                className="btn btn-outline btn-sm text-red-500 border-red-500 hover:bg-red-500 hover:text-white flex items-center"
-              >
-                <Youtube /> Upload Video
-              </button>
+              <div className="flex flex-1 w-full">
+                {loading ? <button
+                  className="btn btn-outline btn-sm text-red-500 border-red-500 hover:bg-red-500 hover:text-white flex items-center flex-1"
+                  disabled={true}
+                >
+                  <LoaderCircle className="w-4 h-4 animate-spin"/>
+                </button> : <button
+                  onClick={() => setStartSync(true)}
+                  disabled={inVideoStream}
+                  className="btn btn-outline btn-sm text-red-500 border-red-500 hover:bg-red-500 hover:text-white flex items-center flex-1"
+                >
+                  <Youtube /> Upload Video
+                </button>
+              }
+              </div>
             )}
 
             {startSync && (
@@ -165,13 +184,21 @@ const InfoSkeleton = () => {
             </div>
 
             {!startSync && (
-              <button
-                onClick={() => setStartSync(true)}
-                disabled={inVideoStream} //or space has a video stream
-                className="btn btn-outline btn-sm text-red-500 border-red-500 hover:bg-red-500 hover:text-white flex items-center"
-              >
-                <Youtube /> Upload Video
-              </button>
+              <div className="flex flex-1 w-full">
+                {loading ? <button
+                  className="btn btn-outline btn-sm text-red-500 border-red-500 hover:bg-red-500 hover:text-white flex items-center flex-1"
+                  disabled={true}
+                >
+                  <LoaderCircle className="w-4 h-4 animate-spin"/>
+                </button> : <button
+                  onClick={() => setStartSync(true)}
+                  disabled={inVideoStream}
+                  className="btn btn-outline btn-sm text-red-500 border-red-500 hover:bg-red-500 hover:text-white flex items-center flex-1"
+                >
+                  <Youtube /> Upload Video
+                </button>
+              }
+              </div>
             )}
 
             {startSync && (
