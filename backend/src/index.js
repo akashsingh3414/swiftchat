@@ -9,6 +9,7 @@ import { app, server } from './lib/socket.js'
 import userRouter from './routes/user.routes.js'
 import spaceRouter from './routes/space.routes.js'
 import { ExpressPeerServer } from 'peer'
+import streamRouter from './routes/stream.routes.js'
 
 dotenv.config()
 
@@ -31,6 +32,7 @@ app.use('/api/message', messageRouter)
 app.use('/api/user', userRouter)
 app.use('/api/space', spaceRouter)
 app.use('/peerjs', peerServer);
+app.use('/api/stream', streamRouter);
 
 const PORT = process.env.PORT || 5001
 server.listen(PORT, () => {

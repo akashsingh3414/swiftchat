@@ -73,7 +73,7 @@ const InfoSkeleton = () => {
 
     setUploadedVideo(null);
     setStartSync(false);
-    startStream();
+    startStream(authUser._id, uploadedVideo, selectedSpace._id);
   }
 
   const handleLeaveSpace = () => leaveSpace(selectedSpace.spaceCode);
@@ -115,7 +115,7 @@ const InfoSkeleton = () => {
             {!startSync && (
               <button
                 onClick={() => setStartSync(true)}
-                disabled={true}
+                disabled={true} //or chat has a video stream
                 className="btn btn-outline btn-sm text-red-500 border-red-500 hover:bg-red-500 hover:text-white flex items-center"
               >
                 <Youtube /> Upload Video
@@ -167,6 +167,7 @@ const InfoSkeleton = () => {
             {!startSync && (
               <button
                 onClick={() => setStartSync(true)}
+                disabled={inVideoStream} //or space has a video stream
                 className="btn btn-outline btn-sm text-red-500 border-red-500 hover:bg-red-500 hover:text-white flex items-center"
               >
                 <Youtube /> Upload Video

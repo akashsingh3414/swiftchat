@@ -57,3 +57,49 @@ export const deleteImageFromCloudinary = async (imageUrl) => {
     }
 };
 
+export const uploadVideoToCloudinary = async (fileName) => {
+    const filePath = path.join(uploadsDir, fileName);
+
+    if (!fs.existsSync(filePath)) {
+        console.error('File not found:', filePath);
+        return null;
+    }
+
+    try {
+        const result = await cloudinary.v2.uploader.upload(filePath, {
+            folder: 'swiftchat',
+            resource_type: 'video'
+        });
+
+        fs.unlinkSync(filePath);
+
+        return { publicUrl: result.secure_url, filePath: result.public_id };
+    } catch (error) {
+        console.error('Cloudinary video upload error:', error);
+        return null;
+    }
+};
+
+export const deleteVideoFromCloudinary = async (videoUrl) => {
+    try {
+        const publicId = videoUrl
+            .split('/')
+            .slice(-2)
+            .join('/')
+            .replace(/\.[^/.]+$/, '');
+
+        const { result } = await cloudinary.v2.uploader.destroy(publicId, {
+            resource_type: 'video'
+        });
+
+        if (result !== 'ok') {
+            console.error('Error deleting video from Cloudinary:', result);
+            return false;
+        }
+        return true;
+    } catch (error) {
+        console.error('Internal error while deleting video from Cloudinary:', error);
+        return false;
+    }
+};
+

@@ -46,7 +46,6 @@ export const useVideoStore = create((set, get) => ({
     }
   
     const socket = useAuthStore.getState().socket;
-    const { authUser } = useAuthStore.getState().authUser;
     if (!socket) {
       console.error('Socket not found. Ensure you are connected.');
       toast.error('Socket connection issue.');
