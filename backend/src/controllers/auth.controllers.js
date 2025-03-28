@@ -25,11 +25,11 @@ export const signup = async (req, res) => {
         })
 
         if(user) {
-            generateToken({userId: user._id}, res)
+            generateToken({userId: user?._id}, res)
             await user.save()
 
             return res.status(201).json({ message: "User created successfully", user: {
-                _id: user._id,
+                _id: user?._id,
                 fullName: user.fullName,
                 email: user.email,
                 profilePic: user.profilePic,
@@ -56,7 +56,7 @@ export const login = async (req, res) => {
             return res.status(400).json({ message: "Invalid credentials"});
         }
 
-        generateToken({userId: user._id}, res)
+        generateToken({userId: user?._id}, res)
         const userObject = user.toObject();
         delete userObject.password;
 

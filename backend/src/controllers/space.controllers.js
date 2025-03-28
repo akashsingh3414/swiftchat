@@ -22,7 +22,7 @@ export const createSpace = async (req, res) => {
         })
 
         const user = await User.findById(userId).select('-password')
-        user.spaces.push(space._id);
+        user.spaces.push(space?._id);
     
         await space.save()
         await user.save()
@@ -63,7 +63,7 @@ export const connectToSpace = async (req, res) => {
         }
 
         space.members.push(userId);
-        user.spaces.push(space._id);
+        user.spaces.push(space?._id);
 
     
         await user.save();
@@ -72,7 +72,7 @@ export const connectToSpace = async (req, res) => {
         return res.status(200).json({
             message: "Successfully joined the space",
             user: {
-                _id: user._id,
+                _id: user?._id,
                 fullName: user.fullName,
                 email: user.email,
                 profilePic: user.profilePic,
@@ -102,12 +102,12 @@ export const leaveSpace = async (req, res) => {
             return res.status(404).json({ message: "User not found" });
         }
 
-        user.spaces = user.spaces.filter(id => id.toString() !== space._id.toString());
+        user.spaces = user.spaces.filter(id => id.toString() !== space?._id.toString());
         await user.save();
 
         if(space.members.length === 0 || space.creator.toString() == userId) {
-            await Message.deleteMany({spaceId: space._id});
-            await Space.findByIdAndDelete(space._id);
+            await Message.deleteMany({spaceId: space?._id});
+            await Space.findByIdAndDelete(space?._id);
             return res.status(200).json({message: "Space deleted"})
         }
 
@@ -247,8 +247,8 @@ export const removeFromSpace = async (req, res) => {
             return res.status(403).json({message: "Action not allowed to non-admins"})
         }
 
-        space.members = space.members.filter(member => member._id != targetUserId);
-        user.spaces = user.spaces.filter(space => space._id != spaceId);
+        space.members = space.members.filter(member => member?._id != targetUserId);
+        user.spaces = user.spaces.filter(space => space?._id != spaceId);
 
         await space.save();
         await user.save();

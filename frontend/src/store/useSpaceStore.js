@@ -62,7 +62,7 @@ export const useSpaceStore = create((set, get) => ({
       await axiosInstance.delete("/space/delete", { data: { spaceId } });
 
       set((state)=>({
-        spaces: state.spaces.filter(space=>space._id!=spaceId),
+        spaces: state.spaces.filter(space=>space?._id!=spaceId),
         selectedSpace: null
       }));
 
@@ -90,11 +90,11 @@ export const useSpaceStore = create((set, get) => ({
     if (!selectedSpace) return;
     try {
       socket.emit("sendGroupMessage", {
-        spaceId: selectedSpace._id,
+        spaceId: selectedSpace?._id,
         ...messageData,
       });
 
-      const res = await axiosInstance.post(`/message/send/${selectedSpace._id}`, messageData, {
+      const res = await axiosInstance.post(`/message/send/${selectedSpace?._id}`, messageData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
@@ -133,7 +133,7 @@ export const useSpaceStore = create((set, get) => ({
     try {
       const res = await axiosInstance.delete('/space/remove-user', { data: {userId: data.userId, spaceId: data.spaceId} })
       set((state)=>({
-        spaceMembers: state.spaceMembers.filter(member=>member._id!=data.userId),
+        spaceMembers: state.spaceMembers.filter(member=>member?._id!=data.userId),
       }))
     } catch (error) {
       toast.error(error.response?.data?.message || error.message);
@@ -160,7 +160,7 @@ export const useSpaceStore = create((set, get) => ({
     const socket = useAuthStore.getState().socket;
     
     socket.on('newGroupMessage', (newMessage) => {
-      const isMessageSentFromSelectedSpace = newMessage.receiverId === selectedSpace._id;
+      const isMessageSentFromSelectedSpace = newMessage.receiverId === selectedSpace?._id;
       if(!isMessageSentFromSelectedSpace) return;
 
       set({
@@ -177,10 +177,10 @@ export const useSpaceStore = create((set, get) => ({
   setSelectedSpace: (selectedSpace) => {
     set({ selectedSpace });
     if (selectedSpace) {
-      get().getMessagesFromSpace(selectedSpace._id);
+      get().getMessagesFromSpace(selectedSpace?._id);
 
       const socket = useAuthStore.getState().socket;
-      socket.emit("joinSpace", selectedSpace._id);
+      socket.emit("joinSpace", selectedSpace?._id);
     }
   },
   

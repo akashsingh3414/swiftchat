@@ -29,7 +29,7 @@ io.on('connection', (socket) => {
   io.emit('getOnlineUsers', Object.keys(userSocketMap));
 
   socket.on('create-vc-room', ({ receiver, myPeerId }) => {
-    const receiverSocketId = getReceiverSocketId(receiver._id);
+    const receiverSocketId = getReceiverSocketId(receiver?._id);
     try {
       socket.to(receiverSocketId).emit('new-vc-room', { remotePeerId: myPeerId, receiver });
     } catch (error) {
@@ -38,13 +38,13 @@ io.on('connection', (socket) => {
   });
 
   socket.on('join-vc-room', ({ receiver, myPeerId }) => {
-    const receiverSocketId = getReceiverSocketId(receiver._id);
+    const receiverSocketId = getReceiverSocketId(receiver?._id);
     socket.to(receiverSocketId).emit('joined-vc-room', { remotePeerId: myPeerId });
   });
 
   socket.on('leave-vc-room', ( receiver) => {
     try {
-      const receiverSocketId = getReceiverSocketId(receiver._id);
+      const receiverSocketId = getReceiverSocketId(receiver?._id);
       socket.to(receiverSocketId).emit('user-disconnected', receiver);
     } catch (error) {
       console.error('Error in leave-vc-room:', error);

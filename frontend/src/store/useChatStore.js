@@ -40,7 +40,7 @@ export const useChatStore = create((set, get) => ({
     if (!selectedUser) return;
 
     try {
-      const res = await axiosInstance.post(`/message/send/${selectedUser._id}`, messageData, {
+      const res = await axiosInstance.post(`/message/send/${selectedUser?._id}`, messageData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
@@ -96,7 +96,7 @@ export const useChatStore = create((set, get) => ({
     const socket = useAuthStore.getState().socket;
 
     socket.on("newMessage", (newMessage) => {
-      const isMessageSentFromSelectedUser = newMessage.senderId === selectedUser._id;
+      const isMessageSentFromSelectedUser = newMessage.senderId === selectedUser?._id;
       
       if (!isMessageSentFromSelectedUser) return;
       set({

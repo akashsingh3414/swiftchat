@@ -25,9 +25,9 @@ export const uploadVideo = async (req, res) => {
         const streamUrl = uploadResponse.publicUrl;
 
         if (space) {
-            io.to(space._id.toString()).emit('new-stream', { hostId, streamUrl, spaceId: receiverId });
+            io.to(space?._id.toString()).emit('new-stream', { hostId, streamUrl, spaceId: receiverId });
         } else {
-            const receiverSocketId = getReceiverSocketId(user._id);
+            const receiverSocketId = getReceiverSocketId(user?._id);
             if (receiverSocketId) {
                 io.to(receiverSocketId).emit('new-stream', { hostId, streamUrl });
             }
@@ -64,7 +64,7 @@ export const deleteVideo = async (req, res) => {
             return res.status(400).json({message: 'Invalid space id'});
         }
 
-        if(user._id.toString() !== host._id.toString()) return res.status(403).json({message: "Action not allowed"});
+        if(user?._id.toString() !== host?._id.toString()) return res.status(403).json({message: "Action not allowed"});
         await deleteVideoFromCloudinary(streamUrl);
         io.to(spaceId).emit('stream-ended', {spaceId});
 

@@ -66,11 +66,11 @@ export const connectUser = async (req, res) => {
             return res.status(404).json({ message: "User not found" });
         }
 
-        if (user._id.equals(targetUser._id)) {
+        if (user?._id.equals(targetUser?._id)) {
             return res.status(400).json({ message: "You cannot connect with yourself" });
         }
 
-       if (user.connectedUsers.includes(targetUser._id)) {
+       if (user.connectedUsers.includes(targetUser?._id)) {
             return res.status(400).json({ message: "Already connected to this user" });
         }
 
@@ -78,8 +78,8 @@ export const connectUser = async (req, res) => {
             return res.status(400).json({ message: "Connection code didn't match" });
         }
 
-        user.connectedUsers.push(targetUser._id);
-        targetUser.connectedUsers.push(user._id);
+        user.connectedUsers.push(targetUser?._id);
+        targetUser.connectedUsers.push(user?._id);
 
         await user.save();
         await targetUser.save();
@@ -104,11 +104,11 @@ export const removeConnection = async (req, res) => {
             return res.status(404).json({ message: "User not found" });
         }
 
-        if (!(user.connectedUsers.includes(targetuser._id))) {
+        if (!(user.connectedUsers.includes(targetuser?._id))) {
             return res.status(400).json({ message: "User not found. Already removed" });
         }
 
-        user.connectedUsers = user.connectedUsers.filter(id => id.toString() !== targetuser._id.toString());
+        user.connectedUsers = user.connectedUsers.filter(id => id.toString() !== targetuser?._id.toString());
 
         targetuser.connectedUsers = targetuser.connectedUsers.filter(id => id.toString() !== userId);
 

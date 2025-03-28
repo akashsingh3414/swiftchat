@@ -10,6 +10,7 @@ import userRouter from './routes/user.routes.js'
 import spaceRouter from './routes/space.routes.js'
 import { ExpressPeerServer } from 'peer'
 import streamRouter from './routes/stream.routes.js'
+import path from 'path'
 
 dotenv.config()
 
@@ -35,6 +36,16 @@ app.use('/peerjs', peerServer);
 app.use('/api/stream', streamRouter);
 
 const PORT = process.env.PORT || 5001
+
+const __dirname = path.resolve();
+
+if(process.env.NODE_ENV === "production") {
+    app.use(express.static(path.join(__dirname, "../frontend/dist")));
+    app.get("*", (req, res)=>{
+        res.sendFile(path.join(__dirname, "../frontend", "dist", "index.html"))
+    })
+}
+
 server.listen(PORT, () => {
     console.log('Server is running at port: ', PORT)
     connectDB()

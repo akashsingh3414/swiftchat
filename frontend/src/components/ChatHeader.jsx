@@ -35,10 +35,10 @@ const ChatHeader = () => {
         if (!currentStream) return;
     
         if (inVideoStream && currentStreamUrl !== currentStream) {
-          leaveStream(authUser._id, currentStreamUrl, selectedSpace._id);
+          leaveStream(authUser?._id, currentStreamUrl, selectedSpace?._id);
         }
     
-        joinStream(authUser._id, currentStream, selectedSpace._id);
+        joinStream(authUser?._id, currentStream, selectedSpace?._id);
       }
     };
     
@@ -49,7 +49,7 @@ const ChatHeader = () => {
     }, [allStreams, selectedSpace]);
 
   const handleDeleteAllMessages = () => {
-    if (selectedSpace) deleteAllSpaceMessages(selectedSpace._id);
+    if (selectedSpace) deleteAllSpaceMessages(selectedSpace?._id);
   };
 
   const handleDeleteMyMessages = () => {
@@ -111,7 +111,7 @@ const ChatHeader = () => {
             >
               Delete my messages
             </button>
-            {selectedSpace && selectedSpace.creator === authUser._id && (
+            {selectedSpace && selectedSpace.creator === authUser?._id && (
               <button
                 onClick={handleDeleteAllMessages}
                 className="block w-full text-left px-3 py-2 text-sm hover:bg-base-200 rounded-md"

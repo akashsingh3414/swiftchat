@@ -47,6 +47,8 @@ export const sendMessage = async (req, res) => {
             user = await User.findById(receiverId.toString());
         }
 
+        const sender = await User.findById(senderId.toString());
+
         let imageUrl;
 
         if(!text && !req.file) {
@@ -62,14 +64,15 @@ export const sendMessage = async (req, res) => {
             senderId,
             text: text ? text : '',
             image: imageUrl,
-            receiverId: space ? space._id : user._id,
+            senderName: sender.fullName,
+            receiverId: space ? space?._id : user?._id,
         })
 
         await newMessage.save()
         if(space) {
-            io.to(space._id.toString()).emit('newGroupMessage', newMessage);
+            io.to(space?._id.toString()).emit('newGroupMessage', newMessage);
         } else {
-            const receiverSocketId = getReceiverSocketId(user._id);
+            const receiverSocketId = getReceiverSocketId(user?._id);
             if(receiverSocketId) {
                 io.to(receiverSocketId).emit('newMessage', newMessage);
             }
@@ -94,8 +97,8 @@ export const deleteUserMessages = async (req, res) => {
         if (!user || !receiver) return res.status(400).json({ message: 'Invalid user id' });
 
         const messages = await Message.find({
-            senderId: user._id,
-            receiverId: receiver._id
+            senderId: user?._id,
+            receiverId: receiver?._id
         });
 
         for (const message of messages) {
@@ -104,7 +107,7 @@ export const deleteUserMessages = async (req, res) => {
             }
         }
 
-        await Message.deleteMany({ senderId: user._id, receiverId: receiver._id });
+        await Message.deleteMany({ senderId: user?._id, receiverId: receiver?._id });
 
         return res.status(200).json({ message: 'Messages deleted successfully' });
 

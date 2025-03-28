@@ -32,13 +32,13 @@ const ChatContainer = () => {
 
   useEffect(() => {
     if (selectedUser) {
-      getMessages(selectedUser._id);
+      getMessages(selectedUser?._id);
       subscribeToMessages();
       return () => unsubscribeFromMessages();
     } else if (selectedSpace) {
-      getMessagesFromSpace(selectedSpace._id);
-      subscribeToSpaceMessages(selectedSpace._id);
-      return () => unsubscribeFromSpaceMessages(selectedSpace._id);
+      getMessagesFromSpace(selectedSpace?._id);
+      subscribeToSpaceMessages(selectedSpace?._id);
+      return () => unsubscribeFromSpaceMessages(selectedSpace?._id);
     }
   }, [
     selectedUser?._id,
@@ -77,14 +77,15 @@ const ChatContainer = () => {
           <div className="p-4 space-y-4">
             {messages.map((message) => (
               <div
-                key={message._id}
-                className={`chat ${message.senderId === authUser._id ? "chat-end" : "chat-start"}`}
+                key={message?._id}
+                className={`chat ${message.senderId === authUser?._id ? "chat-end" : "chat-start"}`}
               >
-                <div className="chat-image avatar">
+                <div className="chat-image avatar flex-col items-center gap-1">
+                  {selectedSpace && message.senderId !== authUser?._id && <span className="mx-1 text-sms opacity-50 ml-1">{message.senderName}</span>}
                   <div className="size-10 rounded-full border">
                     <img
                       src={
-                        message.senderId === authUser._id
+                        message.senderId === authUser?._id
                           ? authUser.profilePic || "/avatar.png"
                           : selectedUser?.profilePic || selectedSpace?.profilePic || "/avatar.png"
                       }
@@ -99,7 +100,7 @@ const ChatContainer = () => {
                 </div>
                 <div
                   className={`chat-bubble rounded-full flex flex-col ${
-                    message.senderId === authUser._id ? "bg-primary text-primary-content" : "bg-base-200 text-base-content"
+                    message.senderId === authUser?._id ? "bg-primary text-primary-content" : "bg-base-200 text-base-content"
                   }`}
                 >
                   {message.image && (

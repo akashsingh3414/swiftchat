@@ -23,8 +23,8 @@ const VideoStream = () => {
   }, [currentStreamUrl]);
 
   useEffect(() => {
-    if (selectedSpace && selectedSpace._id && usersInCurrentStream && usersInCurrentStream[selectedSpace._id]) {
-      setViewers(usersInCurrentStream[selectedSpace._id]);
+    if (selectedSpace && selectedSpace?._id && usersInCurrentStream && usersInCurrentStream[selectedSpace?._id]) {
+      setViewers(usersInCurrentStream[selectedSpace?._id]);
     } else {
       setViewers([]);
     }
@@ -32,12 +32,12 @@ const VideoStream = () => {
 
   const handleLeaveStream = () => {
     console.log(usersInCurrentStream)
-    leaveStream(authUser._id, currentStreamUrl, selectedSpace._id, usersInCurrentStream);
+    leaveStream(authUser?._id, currentStreamUrl, selectedSpace?._id, usersInCurrentStream);
   };
 
   const handleStopStream = () => {
     console.log(currentStreamUrl);
-    stopStream(hostId, currentStreamUrl, selectedSpace._id);
+    stopStream(hostId, currentStreamUrl, selectedSpace?._id);
   };
 
   return (
@@ -50,7 +50,7 @@ const VideoStream = () => {
           <button className="btn btn-error btn-sm btn-outline py-0 px-1 mx-1" onClick={handleLeaveStream}>
             Leave Stream
           </button>
-          {hostId === authUser._id && (
+          {hostId === authUser?._id && (
             <button className="btn btn-error btn-sm btn-outline py-0 px-1" onClick={handleStopStream}>
               Stop Stream
             </button>
@@ -69,7 +69,7 @@ const VideoStream = () => {
           {viewers.length > 0 ? (
             <div className="space-y-2 max-h-40 overflow-y-auto">
               {viewers.map(userId => (
-                <ViewerItem key={userId} userId={userId} isHost={userId === hostId} isYou={userId === authUser._id} />
+                <ViewerItem key={userId} userId={userId} isHost={userId === hostId} isYou={userId === authUser?._id} />
               ))}
             </div>
           ) : (
