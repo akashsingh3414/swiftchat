@@ -13,7 +13,13 @@ export const useVideoStore = create((set, get) => ({
 
   initPeer: async () => {
     return new Promise((resolve, reject) => {
-      const peer = new Peer(undefined, { host: 'localhost', port: 3000, path: '/peerjs' });
+      const peer = new Peer(undefined, {
+        host: process.env.NODE_ENV === 'production' ? import.meta.env.VITE_HOST : 'localhost',
+        port: process.env.NODE_ENV === 'production' ? 443 : 3000,        
+        path: '/peerjs',
+        secure: process.env.NODE_ENV === 'production',
+      });
+      
       set({ peer });
 
       peer.on('open', (id) => {

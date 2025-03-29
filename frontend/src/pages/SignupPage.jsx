@@ -2,9 +2,8 @@ import { useState } from "react";
 import { useAuthStore } from "../store/useAuthStore.js";
 import { Eye, EyeOff, Loader2, Lock, Mail, MessageSquare, User } from "lucide-react";
 import { Link } from "react-router-dom";
-
-import AuthImagePattern from "../components/AuthImagePattern.jsx";
 import { toast } from "sonner";
+import { WelcomeContent } from "../components/NoChatSelected.jsx";
 
 const SignUpPage = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -38,7 +37,7 @@ const SignUpPage = () => {
   };
 
   return (
-    <div className="min-h-screen grid lg:grid-cols-2">
+    <div className="min-h-screen h-full grid lg:grid-cols-2">
       {/* Left Side */}
       <div className="flex flex-col justify-center items-center p-6 sm:p-12">
         <div className="w-full max-w-md space-y-8">
@@ -144,12 +143,9 @@ const SignUpPage = () => {
           </div>
         </div>
       </div>
-
-      {/* Right Side */}
-      <AuthImagePattern
-        title="Join our community"
-        subtitle="Connect with friends, share moments, and stay in touch with your loved ones."
-      />
+      <div className="mt-16">
+        <WelcomeContent/>
+      </div>
     </div>
   );
 };

@@ -1,6 +1,6 @@
 import { useChatStore } from "../store/useChatStore";
 import Sidebar from "../components/Sidebar";
-import NoChatSelected from "../components/NoChatSelected";
+import NoChatSelected, { WelcomeContent } from "../components/NoChatSelected";
 import ChatContainer from "../components/ChatContainer";
 import { useSpaceStore } from "../store/useSpaceStore";
 import InfoSkeleton from "../components/skeletons/InfoSkeleton";
@@ -27,9 +27,9 @@ const HomePage = () => {
           <div className="flex h-full overflow-hidden w-full">
             <Sidebar />
             <InfoSkeleton />
-            {!selectedUser && !selectedSpace ? <NoChatSelected /> : (!isInCall || !myPeerId) ? <>
-              <ChatContainer />
-              {inVideoStream &&  <VideoStream />}            
+            {!selectedUser && !selectedSpace ? <><NoChatSelected /> <WelcomeContent/></> : (!isInCall || !myPeerId) ? <>
+            <ChatContainer />
+            {inVideoStream && <VideoStream />}
             </> : <>
               <ChatContainer />
               <div className="w-full lg:max-w-[40%]">

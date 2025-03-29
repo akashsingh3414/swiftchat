@@ -102,8 +102,8 @@ const InfoSkeleton = () => {
   if (!selectedSpace && !selectedUser) return null;
 
   return (
-    <div className="h-full w-full max-w-64 flex flex-col bg-base-200">
-      {selectedUser ? (
+<div className="hidden sm:flex h-full w-full max-w-64 flex-col bg-base-200">
+{selectedUser ? (
         <div className="flex flex-col h-full items-center p-4">
           <div className="avatar">
             <div className="w-24 rounded-full">
