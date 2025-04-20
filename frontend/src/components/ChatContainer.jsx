@@ -98,20 +98,31 @@ const ChatContainer = () => {
                     {formatMessageTime(message.createdAt)}
                   </time>
                 </div>
-                <div
-                  className={`chat-bubble rounded-full flex flex-col ${
-                    message.senderId === authUser?._id ? "bg-primary text-primary-content" : "bg-base-200 text-base-content"
-                  }`}
-                >
-                  {message.image && (
-                    <img
-                      src={message.image || "/placeholder.svg"}
-                      alt="Attachment"
-                      className="sm:max-w-[200px] rounded-md mb-2"
-                    />
-                  )}
-                  {message.text && <p className="break-words">{message.text}</p>}
-                </div>
+                {(message.text || (!message.image && message.text)) && (
+                  <div
+                    className={`chat-bubble flex flex-col ${
+                      message.senderId === authUser?._id
+                        ? "bg-primary text-primary-content"
+                        : "bg-base-200 text-base-content"
+                    }`}
+                  >
+                    {message.image && (
+                      <img
+                        src={message.image || "/placeholder.svg"}
+                        alt="Attachment"
+                        className="sm:max-w-[200px] rounded-md mb-2"
+                      />
+                    )}
+                    {message.text && <p className="break-words">{message.text}</p>}
+                  </div>
+                )}
+                {!message.text && message.image && (
+                  <img
+                    src={message.image || "/placeholder.svg"}
+                    alt="Attachment"
+                    className="sm:max-w-[200px] rounded-md mb-2"
+                  />
+                )}
               </div>
             ))}
             <div ref={messageEndRef} />

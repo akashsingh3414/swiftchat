@@ -198,9 +198,10 @@ export const useSpaceStreamStore = create((set, get) => ({
     stopStream: async (hostId, streamUrl, spaceId) => {
         console.log("Stopping stream");
         const socket = useAuthStore.getState().socket;
-        await axiosInstance.delete('/stream/delete-stream', { data: { hostId, streamUrl, spaceId } });
+        const deleteVideo = await axiosInstance.delete('/stream/delete-stream', { data: { hostId, streamUrl, spaceId } });
+        // console.log(deleteVideo);
         
-        socket.emit('stream-stopped', { hostId, streamUrl, spaceId });
+        // socket.emit('stream-stopped', { hostId, streamUrl, spaceId });
 
         set((state) => {
             const updatedStreams = { ...state.allStreams };

@@ -17,7 +17,6 @@ const VideoCall = () => {
 
   const navigate = useNavigate();
   const { selectedUser } = useChatStore();
-  const { authUser } = useAuthStore();
   const { myPeerId, remotePeerId } = useVideoStore();
 
   const localVideoRef = useRef(null);
@@ -26,6 +25,10 @@ const VideoCall = () => {
   const [isMicOn, setIsMicOn] = useState(true);
   const [isVideoOn, setIsVideoOn] = useState(true);
   const [isSoundOn, setIsSoundOn] = useState(true);
+
+    useEffect(() => {
+      listenForNewRoom();
+    }, []);
 
   const handleDisconnect = () => {
     try {

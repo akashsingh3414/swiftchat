@@ -3,7 +3,7 @@ import { useAuthStore } from "../store/useAuthStore.js";
 import { Eye, EyeOff, Loader2, Lock, Mail, MessageSquare, User } from "lucide-react";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
-import { WelcomeContent } from "../components/NoChatSelected.jsx";
+import WelcomeContent from "../components/WelcomeContent.jsx";
 
 const SignUpPage = () => {
   const [showPassword, setShowPassword] = useState(false);

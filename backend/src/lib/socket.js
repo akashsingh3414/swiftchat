@@ -1,6 +1,8 @@
 import { Server } from 'socket.io';
 import http from 'http';
 import express from 'express';
+import Stream from '../models/stream.models.js';
+import User from '../models/user.models.js';
 
 const app = express();
 const server = http.createServer(app);
@@ -61,17 +63,81 @@ io.on('connection', (socket) => {
     console.log(`User ${socket.id} joined space ${spaceId}`);
   });
 
-  socket.on('join-stream', ({userId, streamUrl, spaceId}) => {
-    console.log(`${userId} joining the stream of space ${spaceId}`)
-    io.to(spaceId.toString()).emit('joined-stream', { userId, streamUrl, spaceId });
-  });
+  socket.on('join-stream', async ({ userId, streamUrl, spaceId }) => {
+    console.log(`${userId} joining the stream of space ${spaceId}`);
+  
+    try {
+      const stream = await Stream.findOne({ spaceId: spaceId });
+  
+      if (stream) {
+        const viewerIndex = stream.viewers.findIndex(viewer => viewer.user.toString() === userId);
+  
+        if (viewerIndex === -1) {
 
-  socket.on('leave-stream', ({userId, streamUrl, spaceId, numOfusers}) => {
-    console.log(`${userId} leaving the stream of space ${spaceId}`)
-    if(numOfusers===1) {
-      io.to(spaceId).emit('stream-ended', {spaceId});
-    } else 
-    io.to(spaceId.toString()).emit('left-stream', { userId, streamUrl, spaceId });
+          const user = await User.findById(userId);
+
+          await Stream.updateOne(
+            { spaceId: spaceId },
+            {
+              $push: {
+                viewers: {
+                  user: userId,
+                  fullName: user.fullName,
+                  joinedAt: [ new Date() ]
+                }
+              }
+            }
+          );
+        } else {
+          await Stream.updateOne(
+            { spaceId: spaceId, 'viewers.user': userId },
+            {
+              $push: {
+                'viewers.$.joinedAt': [ new Date() ]
+              }
+            }
+          );
+        }
+  
+        io.to(spaceId.toString()).emit('joined-stream', { userId, streamUrl, spaceId });
+      }
+    } catch (error) {
+      console.error('Error in join-stream:', error);
+      socket.emit('error', { message: 'Failed to join stream' });
+    }
+  });
+  
+
+  socket.on('leave-stream', async ({ userId, streamUrl, spaceId, numOfusers }) => {
+    console.log(`${userId} leaving the stream of space ${spaceId}`);
+  
+    try {
+      const stream = await Stream.findOne({ spaceId: spaceId });
+  
+      if (stream) {
+        const viewer = stream.viewers.find(viewer => viewer.user.toString() === userId);
+  
+        if (viewer) {
+          await Stream.updateOne(
+            { spaceId: spaceId, 'viewers.user': userId },
+            {
+              $push: {
+                'viewers.$.leftAt': [ new Date() ]
+              }
+            },
+          );
+        }
+  
+        if (numOfusers === 1) {
+          io.to(spaceId.toString()).emit('stream-ended', { spaceId });
+        } else {
+          io.to(spaceId.toString()).emit('left-stream', { userId, streamUrl, spaceId });
+        }
+      }
+    } catch (error) {
+      console.error('Error in leave-stream:', error);
+      socket.emit('error', { message: 'Failed to leave stream properly' });
+    }
   });
 
   socket.on('disconnect', () => {

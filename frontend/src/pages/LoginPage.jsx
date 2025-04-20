@@ -4,7 +4,7 @@ import { useChatStore } from "../store/useChatStore";
 import { useSpaceStore } from "../store/useSpaceStore";
 import { Link } from "react-router-dom";
 import { Eye, EyeOff, Loader2, Lock, Mail, MessageSquare } from "lucide-react";
-import { WelcomeContent } from "../components/NoChatSelected";
+import WelcomeContent from "../components/WelcomeContent";
 
 const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);

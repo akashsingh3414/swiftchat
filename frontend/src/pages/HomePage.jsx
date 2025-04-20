@@ -1,6 +1,6 @@
 import { useChatStore } from "../store/useChatStore";
 import Sidebar from "../components/Sidebar";
-import NoChatSelected, { WelcomeContent } from "../components/NoChatSelected";
+import NoChatSelected from "../components/NoChatSelected";
 import ChatContainer from "../components/ChatContainer";
 import { useSpaceStore } from "../store/useSpaceStore";
 import InfoSkeleton from "../components/skeletons/InfoSkeleton";
@@ -9,6 +9,7 @@ import { useVideoStore } from "../store/useVideoStore";
 import VideoStream from '../components/VideoStream'
 import { useSpaceStreamStore } from "../store/useSpaceStreamStore";
 import { useEffect } from "react";
+import WelcomeContent from "../components/WelcomeContent";
 
 const HomePage = () => {
   const { selectedUser } = useChatStore();

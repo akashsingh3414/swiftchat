@@ -178,10 +178,10 @@ const InfoSkeleton = () => {
           <div className="divider mt-5"></div>
 
           <div className="flex flex-col w-full gap-2">
-            <div className="flex justify-between items-center">
+            {selectedSpace.creator == authUser._id && <div className="flex justify-between items-center">
               <span className="font-semibold">Enable Joining</span>
               <input type="checkbox" checked={acceptInvite} onChange={handleToggleInvite} className="toggle toggle-success rounded-full" />
-            </div>
+            </div>}
 
             {!startSync && (
               <div className="flex flex-1 w-full">
