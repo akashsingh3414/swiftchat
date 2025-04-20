@@ -70,13 +70,15 @@ cd ../frontend
 npm install
 npm run dev
 ```
+## Future Improvements
 
-## 📊 Video Stream Logs
-* **Location:** Accessible via host dashboard.
-* **Data Includes:**
-   * Username / user ID
-   * Join timestamp
-   * Leave timestamp
-* **Actions Available to Host:**
-   * View all current/past viewers
-   * Delete individual user log entries
+- **Docker & CI/CD**: Containerization, Docker Compose, and automated deployment.
+- **Kafka Integration**: Event-driven messaging for scalability and real-time processing.
+- **Redis**: Caching, sessions, rate limiting, and real-time notifications.
+- **Synchronized Watch**: Group viewing with shared controls and reactions.
+- **Other Plans**: Message translation, encryption, AI moderation, screen sharing, and third-party integrations (e.g., Spotify, YouTube).
+
+## Contribute to SwiftChat
+
+SwiftChat is an evolving project, and there’s so much more on the horizon.  
+Feel free to fork the repo, open issues, or submit pull requests — contributions of all kinds are welcome!
